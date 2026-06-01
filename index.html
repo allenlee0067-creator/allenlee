@@ -1,0 +1,2577 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>맴맴곳곳 디자인랩 · MMGG Design Lab — Consultation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Gowun+Batang:wght@400;700&family=Caveat:wght@400;500&display=swap" />
+<style>
+  :root{
+    --bg:        #efe9dc;
+    --bg-2:      #e3dcc9;
+    --bg-3:      #d4cab2;
+    --paper:     #f7f2e6;
+    --ink:       #0e0d0b;
+    --ink-2:     #2a2722;
+    --ink-3:     #6e6862;
+    --ink-4:     #a8a094;
+    --line:      #d4cdba;
+    --line-2:    #beb5a0;
+    --accent:    #c14a2b;  /* terracotta — warm, confident, anti-blue */
+    --accent-d:  #8f3219;
+    --accent-l:  #e9c4b3;
+    --accent-wash:#f1d9cd;
+    --danger:    #8a3a2a;
+    --ok:        #4a5a3e;
+    --radius:    2px;
+    --radius-sm: 2px;
+    --radius-lg: 4px;
+    --shadow-1:  0 1px 0 rgba(14,13,11,.04);
+    --shadow-2:  0 1px 0 rgba(14,13,11,.04), 0 12px 32px -16px rgba(14,13,11,.18);
+    --mono:      "IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --sans:      "Pretendard Variable","Pretendard","Apple SD Gothic Neo","Helvetica Neue",system-ui,sans-serif;
+    --display:   "Pretendard Variable","Pretendard","Apple SD Gothic Neo","Helvetica Neue",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    font-size:15px;
+    line-height:1.55;
+    letter-spacing:-0.005em;
+  }
+  ::selection{background:var(--accent-wash);color:var(--ink)}
+  a{color:inherit}
+  button{font-family:inherit;cursor:pointer}
+  input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+  textarea{resize:vertical}
+
+  /* ---------- paper grain (subtle, body-wide) ---------- */
+  /* ---------- top nav ---------- */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(239,233,220,.85);
+    backdrop-filter:saturate(140%) blur(12px);
+    -webkit-backdrop-filter:saturate(140%) blur(12px);
+    border-bottom:1px solid rgba(14,13,11,.08);
+  }
+  .nav-inner{
+    max-width:1280px;margin:0 auto;
+    padding:18px 36px;
+    display:grid;grid-template-columns: 1fr auto 1fr;
+    align-items:center;gap:24px;
+  }
+  .brand{
+    display:flex;align-items:center;gap:12px;
+    text-decoration:none;color:var(--ink);
+    justify-self:start;
+  }
+  .brand-mark{
+    width:30px;height:30px;flex-shrink:0;
+    background:var(--ink);color:var(--paper);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-weight:800;
+    font-size:13px;letter-spacing:-.02em;
+  }
+  .brand-wordmark{
+    height:24px;width:auto;display:block;
+    object-fit:contain;
+    flex-shrink:0;
+  }
+  .brand-wordmark--lg{height:28px}
+  .brand-wordmark--inv{
+    filter:invert(96%) sepia(7%) saturate(280%) hue-rotate(355deg) brightness(99%) contrast(94%);
+  }
+  .brand-kr{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:17px;
+    letter-spacing:-.02em;
+    line-height:1;
+  }
+  .brand-en{
+    font-family:var(--mono);
+    font-size:10px;font-weight:500;
+    letter-spacing:.22em;
+    color:var(--ink-3);
+    text-transform:uppercase;
+    line-height:1.3;
+    border-left:1px solid var(--line-2);
+    padding-left:12px;
+    margin-left:2px;
+  }
+  .brand-en em{font-style:normal;color:var(--ink-2);display:block}
+  .brand-logo,.brand-inline{display:none}
+  .nav-links{
+    display:flex;gap:32px;
+    font-family:var(--mono);
+    font-size:11px;letter-spacing:.22em;
+    color:var(--ink-2);text-transform:uppercase;font-weight:500;
+    justify-self:center;
+  }
+  .nav-links a{text-decoration:none;padding:6px 0;transition:color .15s}
+  .nav-links a:hover{color:var(--accent)}
+  .nav-cta{
+    font-family:var(--mono);
+    font-size:11px;font-weight:600;letter-spacing:.22em;
+    text-transform:uppercase;
+    padding:13px 22px;
+    background:var(--ink);color:var(--paper);
+    border:none;border-radius:0;
+    display:inline-flex;align-items:center;gap:10px;
+    transition:background .2s;
+    justify-self:end;
+  }
+  .nav-cta:hover{background:var(--accent)}
+  .nav-cta::after{
+    content:"→";font-family:var(--sans);
+    font-size:13px;letter-spacing:0;
+  }
+  @media (max-width:980px){
+    .nav-links{display:none}
+    .nav-inner{grid-template-columns:1fr auto;padding:14px 20px}
+    .brand-en{display:none}
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    max-width:1280px;margin:0 auto;
+    padding:80px 36px 40px;
+  }
+  .hero-meta{
+    display:flex;align-items:center;gap:18px;
+    margin-bottom:56px;
+    font-family:var(--mono);
+    font-size:11px;letter-spacing:.22em;
+    color:var(--ink-3);text-transform:uppercase;
+    font-weight:500;
+  }
+  .hero-meta .num-tag{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--ink-2);
+  }
+  .hero-meta .num-tag::before{
+    content:"";width:7px;height:7px;background:var(--accent);
+    border-radius:0;
+  }
+  .hero-meta .rule{flex:1;height:1px;background:var(--line-2);max-width:200px}
+
+  .display{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(48px, 8.2vw, 132px);
+    line-height:.95;
+    letter-spacing:-.045em;
+    color:var(--ink);
+    margin:0;
+    text-wrap:balance;
+  }
+  .display .line{display:block}
+  .display .line.r2{padding-left:6vw}
+  .display .line.r3{padding-left:14vw}
+  .display .punc{color:var(--accent)}
+  .display .alt{
+    font-style:italic;font-weight:300;
+    letter-spacing:-.02em;
+  }
+  .display .strike{
+    position:relative;display:inline-block;
+    font-weight:300;font-style:italic;
+    color:var(--ink-3);
+  }
+  .display .strike::after{
+    content:"";position:absolute;left:-2%;right:-2%;
+    top:55%;height:.06em;background:var(--accent);
+    transform:rotate(-2deg);
+  }
+  @media (max-width:760px){
+    .display .line.r2{padding-left:6vw}
+    .display .line.r3{padding-left:0}
+  }
+
+  .hero-subline{
+    font-family:var(--display);
+    font-weight:500;
+    font-size:clamp(16px, 1.6vw, 22px);
+    line-height:1.55;
+    letter-spacing:-.012em;
+    color:var(--ink-2);
+    margin:36px 0 0;
+    max-width:720px;
+    text-wrap:pretty;
+  }
+  .hero-subline .en{
+    display:block;
+    font-family:var(--display);
+    font-weight:300;font-style:italic;
+    color:var(--ink-3);
+    font-size:.82em;letter-spacing:-.005em;
+    margin-top:8px;
+  }
+
+  .hero-tags{
+    display:flex;flex-wrap:wrap;gap:28px;
+    margin-top:42px;
+    font-family:var(--mono);
+    font-size:13px;font-weight:600;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--ink);
+  }
+  .hero-tags span{display:flex;align-items:center;gap:10px}
+  .hero-tags span::before{
+    content:"";width:6px;height:6px;background:var(--accent);
+    transform:rotate(45deg);
+  }
+
+  /* image strip below hero headline — 4 work-loops */
+  .hero-strip{
+    max-width:1280px;margin:64px auto 0;
+    padding:0 36px;
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:14px;
+  }
+  .strip-frame{
+    position:relative;
+    aspect-ratio:3/4;
+    overflow:hidden;
+    background:var(--bg-2);
+    color:var(--ink-2);
+    margin:0;
+  }
+  .strip-frame .loop{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    color:inherit;
+  }
+  .strip-frame figcaption{
+    position:absolute;left:14px;bottom:14px;right:14px;
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-family:var(--mono);
+    font-size:10px;letter-spacing:.22em;
+    color:var(--ink-2);
+    text-transform:uppercase;font-weight:600;
+    z-index:3;
+  }
+  .strip-frame figcaption .kr{
+    font-family:var(--display);
+    font-weight:600;letter-spacing:-.005em;
+    color:var(--ink-3);
+    font-size:12px;text-transform:none;
+  }
+  .strip-frame .ord{
+    position:absolute;left:14px;top:14px;
+    font-family:var(--mono);
+    font-size:10px;letter-spacing:.22em;
+    color:var(--ink-3);font-weight:600;text-transform:uppercase;
+    z-index:3;
+  }
+
+  /* base loop colors — soft warm neutrals */
+  .strip-frame.f1{background:linear-gradient(160deg,#ece5d4,#d6cdb8);color:#4a423a}
+  .strip-frame.f2{background:linear-gradient(160deg,#e2d6c0,#c3b39a);color:#4a3e30}
+  .strip-frame.f3{background:linear-gradient(160deg,#dfd5c4,#b8ad96);color:#3e3a32}
+  .strip-frame.f4{background:linear-gradient(160deg,#d6c8b5,#a89684);color:#3a322a}
+
+  /* === LOOP 01 — MEASURE === */
+  .loop-measure .axis{
+    stroke:currentColor;stroke-width:1;
+    stroke-dasharray:240;stroke-dashoffset:240;
+    animation:lm-line 5s ease-in-out infinite;
+  }
+  .loop-measure .tick{
+    stroke:currentColor;stroke-width:1;opacity:0;
+    animation:lm-tick 5s ease-in-out infinite;
+  }
+  .loop-measure .tick:nth-child(2){animation-delay:.2s}
+  .loop-measure .tick:nth-child(3){animation-delay:.4s}
+  .loop-measure .tick:nth-child(4){animation-delay:.6s}
+  .loop-measure .tick:nth-child(5){animation-delay:.8s}
+  .loop-measure .tick:nth-child(6){animation-delay:1.0s}
+  .loop-measure .tick:nth-child(7){animation-delay:1.2s}
+  .loop-measure .num{
+    fill:currentColor;opacity:0;
+    font-family:var(--mono);font-size:9px;letter-spacing:.18em;font-weight:600;
+    animation:lm-num 5s ease-in-out infinite;
+  }
+  @keyframes lm-line{
+    0%{stroke-dashoffset:240}
+    30%{stroke-dashoffset:0}
+    85%{stroke-dashoffset:0;opacity:1}
+    100%{stroke-dashoffset:0;opacity:0}
+  }
+  @keyframes lm-tick{
+    0%,8%{opacity:0;transform:translateY(2px)}
+    30%,85%{opacity:.85;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(0)}
+  }
+  @keyframes lm-num{
+    0%,40%{opacity:0;transform:translateY(2px)}
+    55%,85%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(0)}
+  }
+
+  /* === LOOP 02 — DRAW (plan line) === */
+  .loop-draw .plan{
+    fill:none;stroke:currentColor;stroke-width:1.2;
+    stroke-dasharray:560;stroke-dashoffset:560;
+    animation:ld-plan 5s ease-in-out infinite;
+  }
+  .loop-draw .pen{
+    fill:currentColor;
+    animation:ld-pen 5s ease-in-out infinite;
+  }
+  .loop-draw .dim{
+    fill:currentColor;opacity:0;
+    font-family:var(--mono);font-size:8px;letter-spacing:.16em;font-weight:600;
+    animation:ld-dim 5s ease-in-out infinite;
+  }
+  @keyframes ld-plan{
+    0%{stroke-dashoffset:560}
+    70%{stroke-dashoffset:0}
+    90%,100%{stroke-dashoffset:0;opacity:1}
+  }
+  @keyframes ld-pen{
+    0%   {transform:translate(40px,80px)}
+    14%  {transform:translate(40px,200px)}
+    28%  {transform:translate(160px,200px)}
+    42%  {transform:translate(160px,140px)}
+    56%  {transform:translate(200px,140px)}
+    70%  {transform:translate(200px,80px)}
+    84%,100%{transform:translate(40px,80px);opacity:0}
+  }
+  @keyframes ld-dim{
+    0%,72%{opacity:0}
+    80%,95%{opacity:.85}
+    100%{opacity:0}
+  }
+
+  /* === LOOP 03 — LEVEL (spirit level) === */
+  .loop-level .bar{
+    transform-origin:50% 50%;
+    animation:llv-bar 5s cubic-bezier(.34,.07,.16,.94) infinite;
+  }
+  .loop-level .bubble{
+    animation:llv-bubble 5s cubic-bezier(.34,.07,.16,.94) infinite;
+  }
+  .loop-level .ok{
+    fill:currentColor;opacity:0;
+    font-family:var(--mono);font-size:8px;letter-spacing:.22em;font-weight:600;
+    animation:llv-ok 5s ease-in-out infinite;
+  }
+  @keyframes llv-bar{
+    0%  {transform:rotate(-3.5deg)}
+    25% {transform:rotate(2.5deg)}
+    50% {transform:rotate(-1.5deg)}
+    72% {transform:rotate(0deg)}
+    100%{transform:rotate(0deg)}
+  }
+  @keyframes llv-bubble{
+    0%  {transform:translateX(18px)}
+    25% {transform:translateX(-14px)}
+    50% {transform:translateX(8px)}
+    72% {transform:translateX(0)}
+    100%{transform:translateX(0)}
+  }
+  @keyframes llv-ok{
+    0%,72%{opacity:0}
+    82%,95%{opacity:.85}
+    100%{opacity:0}
+  }
+
+  /* === LOOP 04 — FINISH (grain + sanding sweep) === */
+  .loop-finish .grain line{
+    stroke:currentColor;stroke-width:.5;opacity:.35;
+  }
+  .loop-finish .sweep{
+    transform:translateX(-100%);
+    animation:lfn-sweep 5s ease-in-out infinite;
+  }
+  .loop-finish .label{
+    fill:currentColor;opacity:0;
+    font-family:var(--mono);font-size:8px;letter-spacing:.22em;font-weight:600;
+    animation:lfn-label 5s ease-in-out infinite;
+  }
+  @keyframes lfn-sweep{
+    0%  {transform:translateX(-100%)}
+    70% {transform:translateX(100%)}
+    100%{transform:translateX(100%)}
+  }
+  @keyframes lfn-label{
+    0%,40%{opacity:0}
+    60%,90%{opacity:.85}
+    100%{opacity:0}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .loop-measure *,.loop-draw *,.loop-level *,.loop-finish *{
+      animation:none !important;
+      stroke-dashoffset:0 !important;
+      opacity:1 !important;
+    }
+  }
+
+  @media (max-width:760px){
+    .hero{padding:48px 22px 24px}
+    .hero-strip{
+      grid-template-columns:repeat(2,1fr);
+      padding:0 22px;margin-top:36px;
+    }
+    .hero-meta{margin-bottom:32px;gap:12px;font-size:10px}
+    .hero-meta .rule{max-width:60px}
+    .hero-tags{gap:14px;font-size:11px;margin-top:28px}
+  }
+
+  /* ---------- statement section ---------- */
+  .statement{
+    max-width:1280px;margin:0 auto;
+    padding:120px 36px 80px;
+    display:grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap:64px;
+    align-items:start;
+  }
+  .statement-label{
+    font-family:var(--mono);
+    font-size:11px;font-weight:600;letter-spacing:.28em;
+    color:var(--ink-3);text-transform:uppercase;
+    padding-top:8px;
+    border-top:2px solid var(--ink);
+    display:inline-block;
+    margin-top:8px;
+  }
+  .statement-body{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:clamp(22px, 2.6vw, 32px);
+    line-height:1.4;
+    letter-spacing:-.018em;
+    color:var(--ink);
+    text-wrap:balance;
+  }
+  .statement-body em{
+    font-style:normal;
+    background-image:linear-gradient(transparent 62%, var(--accent-l) 62%);
+    background-repeat:no-repeat;
+    padding:0 2px;
+  }
+  .statement-body .en{
+    display:block;
+    font-family:var(--display);
+    font-weight:300;font-style:italic;
+    color:var(--ink-3);
+    font-size:.62em;letter-spacing:-.005em;
+    line-height:1.5;
+    margin-top:22px;
+    text-wrap:pretty;
+  }
+  .statement-meta{
+    margin-top:36px;
+    display:flex;gap:36px;flex-wrap:wrap;
+    font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    color:var(--ink-3);text-transform:uppercase;
+  }
+  @media (max-width:760px){
+    .statement{grid-template-columns:1fr;padding:64px 22px 48px;gap:24px}
+  }
+
+  /* ---------- approach (4-step process) ---------- */
+  .approach{
+    background:var(--ink);
+    color:var(--paper);
+    padding:96px 36px 96px;
+  }
+  .approach-inner{
+    max-width:1280px;margin:0 auto;
+  }
+  .approach-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding-bottom:28px;margin-bottom:48px;
+    border-bottom:1px solid rgba(247,242,230,.18);
+  }
+  .approach-head h2{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(28px, 4vw, 52px);
+    letter-spacing:-.025em;line-height:1;
+    margin:0;
+  }
+  .approach-head h2 em{
+    font-style:italic;font-weight:300;color:var(--accent-l);
+  }
+  .approach-head .idx{
+    font-family:var(--mono);
+    font-size:11px;letter-spacing:.22em;
+    color:rgba(247,242,230,.55);text-transform:uppercase;
+  }
+  .approach-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:0;
+    border-top:1px solid rgba(247,242,230,.18);
+  }
+  .approach-step{
+    padding:36px 28px 36px 0;
+    border-right:1px solid rgba(247,242,230,.18);
+    position:relative;
+  }
+  .approach-step:last-child{border-right:none;padding-right:0}
+  .approach-step:not(:first-child){padding-left:28px}
+  .approach-step .step-no{
+    font-family:var(--mono);
+    font-size:11px;letter-spacing:.22em;
+    color:var(--accent);
+    font-weight:600;text-transform:uppercase;
+    margin-bottom:18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .approach-step .step-no::after{
+    content:"";flex:1;height:1px;
+    background:rgba(247,242,230,.18);
+    max-width:60px;
+  }
+  .approach-step h4{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(28px, 3.2vw, 44px);
+    letter-spacing:-.03em;line-height:1;
+    margin:0 0 4px;
+  }
+  .approach-step .kr{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:16px;letter-spacing:-.01em;
+    color:var(--accent-l);
+    margin:0 0 22px;
+  }
+  .approach-step p{
+    font-family:var(--sans);
+    font-size:13.5px;line-height:1.75;
+    color:rgba(247,242,230,.75);
+    margin:0;text-wrap:pretty;
+  }
+  @media (max-width:980px){
+    .approach{padding:64px 22px}
+    .approach-grid{grid-template-columns:1fr 1fr;border-top:none}
+    .approach-step{
+      border-right:none;border-bottom:1px solid rgba(247,242,230,.18);
+      padding:28px 24px;
+    }
+    .approach-step:nth-child(odd){border-right:1px solid rgba(247,242,230,.18)}
+    .approach-step:nth-child(2n){padding-left:24px}
+    .approach-step:not(:first-child){padding-left:24px}
+  }
+  @media (max-width:560px){
+    .approach-grid{grid-template-columns:1fr}
+    .approach-step{padding:24px 0 !important;border-right:none}
+  }
+
+  /* ---------- pillars (3-up philosophy cards) ---------- */
+  .pillars{
+    max-width:1280px;margin:0 auto;
+    padding:40px 36px 100px;
+  }
+  .pillars-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding-bottom:24px;margin-bottom:32px;
+    border-bottom:1px solid var(--ink);
+  }
+  .pillars-head h2{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(28px, 4vw, 52px);
+    letter-spacing:-.025em;line-height:1;
+    margin:0;
+  }
+  .pillars-head .idx{
+    font-family:var(--mono);
+    font-size:11px;letter-spacing:.22em;
+    color:var(--ink-3);text-transform:uppercase;
+  }
+  .pillars-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:32px;
+  }
+  .pillar{
+    display:flex;flex-direction:column;
+  }
+  .pillar-img{
+    aspect-ratio:4/5;
+    background:var(--bg-2);
+    position:relative;overflow:hidden;
+    margin-bottom:24px;
+  }
+  .pillar-img::before{
+    content:"";position:absolute;inset:0;
+    background-image:repeating-linear-gradient(45deg,
+      rgba(14,13,11,0) 0 10px,
+      rgba(14,13,11,.07) 10px 11px);
+  }
+  .pillar-img .ord{
+    position:absolute;top:18px;left:18px;
+    font-family:var(--mono);
+    font-size:11px;letter-spacing:.22em;
+    color:rgba(247,242,230,.95);
+    mix-blend-mode:difference;font-weight:600;
+  }
+  .pillar-img .hint{
+    position:absolute;left:18px;bottom:18px;right:18px;
+    font-family:var(--mono);
+    font-size:10px;letter-spacing:.16em;
+    color:rgba(247,242,230,.85);
+    text-transform:uppercase;
+    mix-blend-mode:difference;
+  }
+  .pillar.p1 .pillar-img{background:linear-gradient(160deg,#ece5d4,#cfc4ad);color:#4a423a}
+  .pillar.p2 .pillar-img{background:linear-gradient(160deg,#dccbb5,#b89f82);color:#3a3024}
+  .pillar.p3 .pillar-img{background:linear-gradient(160deg,#cebdae,#a89684);color:#322a22}
+  .pillar .pillar-img::before{
+    background-image:repeating-linear-gradient(45deg,
+      rgba(14,13,11,0) 0 12px,
+      rgba(14,13,11,.04) 12px 13px) !important;
+  }
+  .pillar .pillar-img .ord{color:currentColor;opacity:.6;mix-blend-mode:normal}
+  .pillar .pillar-img .hint{color:currentColor;opacity:.55;mix-blend-mode:normal}
+  .pillar h3{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:24px;letter-spacing:-.018em;
+    margin:0 0 6px;
+    display:flex;align-items:baseline;gap:10px;
+    flex-wrap:wrap;
+  }
+  .pillar h3 small{
+    font-family:var(--mono);
+    font-size:11px;font-weight:500;letter-spacing:.18em;
+    color:var(--accent);text-transform:uppercase;
+  }
+  .pillar .pillar-sub{
+    font-family:var(--display);
+    font-weight:600;color:var(--ink-2);
+    font-size:14px;letter-spacing:-.005em;
+    margin:0 0 14px;
+  }
+  .pillar p{
+    font-family:var(--sans);
+    font-size:14px;line-height:1.7;color:var(--ink-2);
+    margin:0 0 8px;text-wrap:pretty;
+  }
+  .pillar .en{
+    font-family:var(--display);
+    font-weight:300;font-style:italic;
+    font-size:13px;line-height:1.55;color:var(--ink-3);
+    margin:0;text-wrap:pretty;
+  }
+  @media (max-width:880px){
+    .pillars{padding:24px 22px 64px}
+    .pillars-grid{grid-template-columns:1fr;gap:48px}
+  }
+
+  /* ---------- divider band (above form) ---------- */
+  .band{
+    background:var(--ink);
+    color:var(--paper);
+    padding:24px 36px;
+    border:none;
+  }
+  .band-inner{
+    max-width:1280px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;gap:32px;
+    font-family:var(--mono);
+    font-size:11px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--paper);
+  }
+  .band-inner .ticker{
+    display:flex;align-items:center;gap:14px;
+    flex:1;min-width:0;
+  }
+  .band-inner .ticker .live{
+    display:flex;align-items:center;gap:8px;
+    color:var(--accent);font-weight:600;flex-shrink:0;
+  }
+  .band-inner .ticker .live::before{
+    content:"";width:7px;height:7px;background:var(--accent);
+    animation:bandpulse 1.6s ease-in-out infinite;
+  }
+  @keyframes bandpulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .band-inner .ticker .msg{
+    color:rgba(247,242,230,.85);font-weight:400;letter-spacing:.16em;
+  }
+  .band-inner .ticker .msg b{color:var(--paper);font-weight:600}
+  .band-inner .pill-row{display:flex;gap:0;flex-shrink:0}
+  .band-inner .pill{
+    font-family:var(--mono);
+    font-size:10px;letter-spacing:.22em;font-weight:500;
+    padding:6px 14px;
+    background:transparent;
+    border:1px solid rgba(247,242,230,.18);
+    border-left:none;
+    color:rgba(247,242,230,.7);
+  }
+  .band-inner .pill:first-child{border-left:1px solid rgba(247,242,230,.18)}
+  /* hide any legacy children injected before */
+  .band-inner > span:empty,
+  .band-inner > .pill-row:empty{display:none}
+  @media (max-width:880px){
+    .band-inner{flex-direction:column;align-items:flex-start;gap:14px}
+    .band{padding:20px 22px}
+  }
+  /* ---------- form section ---------- */
+  .form-section{
+    max-width:1240px;margin:0 auto;
+    padding:80px 28px 100px;
+    display:grid;
+    grid-template-columns: 320px 1fr;
+    gap:56px;
+    align-items:start;
+  }
+  .side{
+    position:sticky;top:88px;
+  }
+  .side .eyebrow{margin-bottom:14px}
+  .side h2{
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:30px;line-height:1.22;
+    letter-spacing:-.025em;
+    margin:0 0 18px;
+  }
+  .side h2 em{
+    font-weight:600;
+    color:var(--accent-d);
+  }
+  .side p{color:var(--ink-3);font-size:14px;margin:0 0 32px;text-wrap:pretty}
+  .stepper{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+  .stepper li{
+    display:flex;align-items:center;gap:14px;
+    padding:11px 12px;border-radius:10px;
+    font-size:13.5px;color:var(--ink-3);
+    list-style:none;
+    transition:background .15s, color .15s;
+  }
+  .stepper li .num{
+    font-family:var(--mono);font-style:normal;
+    width:24px;text-align:right;color:var(--ink-4);
+    font-size:14px;
+    transition:color .15s;
+  }
+  .stepper li.done{color:var(--ink-2)}
+  .stepper li.done .num{color:var(--accent)}
+  .stepper li.done .num::after{
+    content:"";display:inline-block;width:0;
+  }
+  .stepper li.active{
+    background:var(--paper);
+    color:var(--ink);
+    box-shadow:var(--shadow-1);
+  }
+  .stepper li.active .num{color:var(--accent-d)}
+  .stepper li .name{font-weight:500}
+
+  .form-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-2);
+    padding:38px 44px 30px;
+    position:relative;
+    overflow:hidden;
+  }
+  .form-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg, var(--accent) var(--progress,14%), var(--line) var(--progress,14%));
+    transition:--progress .4s ease;
+  }
+  .form-head{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:1px solid var(--line);
+    padding-bottom:18px;margin-bottom:28px;
+  }
+  .form-head .step-label{
+    font-size:11px;letter-spacing:.32em;
+    color:var(--accent-d);font-weight:700;text-transform:uppercase;
+  }
+  .form-head .step-counter{
+    font-family:var(--mono);font-style:normal;
+    color:var(--ink-4);font-size:14px;
+  }
+  .step-title{
+    font-size:26px;font-weight:600;
+    letter-spacing:-.022em;line-height:1.25;
+    margin:0 0 8px;
+    text-wrap:balance;
+  }
+  .step-title em{
+    font-weight:600;color:var(--accent-d);
+  }
+  .step-sub{color:var(--ink-3);font-size:14.5px;margin:0 0 28px;text-wrap:pretty}
+
+  .step{display:none;animation:fadeIn .35s ease}
+  .step.active{display:block}
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(6px)}
+    to{opacity:1;transform:none}
+  }
+
+  /* field primitives */
+  .field{margin-bottom:22px}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+  @media (max-width:640px){.field-row{grid-template-columns:1fr}}
+  .label{
+    display:flex;align-items:center;gap:8px;
+    font-size:13px;font-weight:600;color:var(--ink);
+    margin-bottom:8px;letter-spacing:-.005em;
+  }
+  .label .req{color:var(--accent);font-weight:700}
+  .label .opt{
+    font-size:11px;color:var(--ink-4);font-weight:500;
+    letter-spacing:.02em;
+  }
+  .input,.textarea,select.input{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:var(--radius-sm);
+    padding:13px 14px;
+    font-size:14.5px;
+    color:var(--ink);
+    transition:border-color .15s, background .15s, box-shadow .15s;
+  }
+  .input::placeholder,.textarea::placeholder{color:var(--ink-4)}
+  .input:hover,.textarea:hover{border-color:var(--line-2)}
+  .input:focus,.textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    background:var(--paper);
+    box-shadow:0 0 0 4px rgba(21,19,15,.10);
+  }
+  .textarea{min-height:96px;line-height:1.55}
+  .input[type="date"]{appearance:none}
+
+  /* ---------- file uploader ---------- */
+  .uploader{
+    margin-top:10px;
+    border:1px dashed var(--line-2);
+    background:var(--bg);
+    padding:14px 16px;
+    border-radius:var(--radius-sm);
+    transition:border-color .15s, background .15s;
+  }
+  .uploader:hover,
+  .uploader.is-dragging{
+    border-color:var(--accent);
+    background:var(--accent-wash);
+  }
+  .uploader-cta{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:14px;cursor:pointer;
+    font-size:13px;color:var(--ink-2);
+    position:relative;
+  }
+  .uploader-cta .lead{
+    display:flex;align-items:center;gap:10px;
+    font-weight:500;
+  }
+  .uploader-cta .ico{
+    width:30px;height:30px;border-radius:50%;
+    background:var(--paper);border:1px solid var(--line-2);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--ink-2);flex-shrink:0;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  .uploader:hover .uploader-cta .ico,
+  .uploader.is-dragging .uploader-cta .ico{
+    background:var(--ink);color:var(--paper);border-color:var(--ink);
+  }
+  .uploader-cta .hint{
+    font-size:11.5px;color:var(--ink-4);
+    letter-spacing:.01em;font-weight:400;
+    text-align:right;
+  }
+  .uploader input[type="file"]{
+    position:absolute;width:1px;height:1px;
+    opacity:0;overflow:hidden;
+    clip:rect(0 0 0 0);
+  }
+  .uploader-list{
+    list-style:none;margin:0;padding:0;
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .uploader-list:not(:empty){margin-top:12px}
+  .uploader-list li{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 12px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius-sm);
+    font-size:12.5px;color:var(--ink-2);
+  }
+  .uploader-list .fname{
+    flex:1;min-width:0;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-weight:500;color:var(--ink);
+  }
+  .uploader-list .fsize{
+    font-family:var(--mono);font-size:10.5px;
+    color:var(--ink-3);letter-spacing:.02em;
+    flex-shrink:0;
+  }
+  .uploader-list .frm{
+    background:transparent;border:none;
+    width:22px;height:22px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--ink-3);cursor:pointer;flex-shrink:0;
+    transition:background .15s, color .15s;
+  }
+  .uploader-list .frm:hover{background:var(--accent-wash);color:var(--accent-d)}
+  .uploader-list .ftype{
+    width:24px;height:24px;flex-shrink:0;
+    border-radius:4px;
+    background:var(--bg-2);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--ink-3);
+    font-family:var(--mono);font-size:8.5px;font-weight:700;
+    letter-spacing:.02em;text-transform:uppercase;
+    overflow:hidden;
+  }
+  .uploader-list .ftype.img{background:var(--accent-wash);color:var(--accent-d)}
+  .uploader-list .ftype img{
+    width:100%;height:100%;object-fit:cover;
+  }
+  @media (max-width:520px){
+    .uploader-cta{flex-wrap:wrap;gap:8px}
+    .uploader-cta .hint{text-align:left;flex-basis:100%}
+  }
+
+  .error-msg{
+    display:none;
+    margin-top:8px;font-size:12.5px;
+    color:var(--danger);
+    letter-spacing:.005em;
+  }
+  .error-msg::before{content:"— "}
+  .field.has-error .input,.field.has-error .textarea{border-color:var(--danger);background:#fcf2ee}
+  .field.has-error .error-msg{display:block}
+  .field.has-error .cards,.field.has-error .chips{outline:1px solid var(--danger);outline-offset:6px;border-radius:6px}
+
+  /* cards (single/multi select tiles) */
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:10px;
+  }
+  .cards.two{grid-template-columns:1fr 1fr}
+  @media (max-width:520px){.cards{grid-template-columns:1fr 1fr}.cards.two{grid-template-columns:1fr}}
+  .card-opt{
+    position:relative;
+    border:1px solid var(--line);
+    background:var(--bg);
+    border-radius:var(--radius-sm);
+    padding:14px 14px;
+    cursor:pointer;
+    transition:all .15s ease;
+    display:flex;align-items:center;gap:10px;
+    font-size:14px;font-weight:500;color:var(--ink-2);
+    user-select:none;
+  }
+  .card-opt:hover{border-color:var(--accent-l);background:var(--paper)}
+  .card-opt input{position:absolute;opacity:0;pointer-events:none}
+  .card-opt .ico{
+    width:22px;height:22px;flex:0 0 22px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--ink-3);
+  }
+  .card-opt[data-selected="true"]{
+    border-color:var(--ink);background:var(--paper);
+    color:var(--ink);font-weight:600;
+    box-shadow:0 0 0 1px var(--ink) inset;
+  }
+  .card-opt[data-selected="true"] .ico{color:var(--accent)}
+  .card-opt[data-selected="true"]::after{
+    content:"";position:absolute;top:8px;right:8px;
+    width:14px;height:14px;border-radius:50%;
+    background:var(--ink);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2.5 6.2l2.3 2.3 4.7-4.7' stroke='%23fbf8f2' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-position:center;background-repeat:no-repeat;
+  }
+  .card-opt.big{padding:22px 18px;font-size:15.5px;flex-direction:column;align-items:flex-start;gap:8px}
+  .card-opt.big .ico{width:28px;height:28px;flex:0 0 28px}
+  .card-opt.big .card-sub{font-size:12.5px;color:var(--ink-3);font-weight:400;letter-spacing:.005em}
+
+  /* chips (small pill selects) */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    position:relative;
+    border:1px solid var(--line);
+    background:var(--bg);
+    border-radius:999px;
+    padding:9px 16px;
+    cursor:pointer;
+    font-size:13.5px;color:var(--ink-2);
+    transition:all .15s;
+    user-select:none;
+  }
+  .chip:hover{border-color:var(--accent-l);background:var(--paper)}
+  .chip input{position:absolute;opacity:0;pointer-events:none}
+  .chip[data-selected="true"]{
+    background:var(--ink);color:var(--paper);border-color:var(--ink);
+  }
+
+  /* swatches (color tone) */
+  .swatches{display:flex;flex-wrap:wrap;gap:10px}
+  .swatch{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 14px 8px 8px;
+    border:1px solid var(--line);
+    border-radius:999px;background:var(--bg);
+    cursor:pointer;font-size:13px;color:var(--ink-2);
+    transition:all .15s;user-select:none;
+  }
+  .swatch:hover{border-color:var(--accent-l);background:var(--paper)}
+  .swatch input{position:absolute;opacity:0;pointer-events:none}
+  .swatch .sw{
+    width:22px;height:22px;border-radius:50%;
+    border:1px solid rgba(43,38,34,.08);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.5);
+  }
+  .swatch[data-selected="true"]{
+    background:var(--ink);color:var(--paper);border-color:var(--ink);
+  }
+
+  /* category mega cards */
+  .mega{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  }
+  @media (max-width:520px){.mega{grid-template-columns:1fr}}
+  .mega .card-opt{
+    padding:24px 22px;align-items:flex-start;flex-direction:column;gap:12px;
+    min-height:140px;
+  }
+  .mega .card-opt .big-ico{
+    width:46px;height:46px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--bg-2);color:var(--accent-d);
+    font-size:22px;
+    transition:background .15s,color .15s;
+  }
+  .mega .card-opt[data-selected="true"] .big-ico{
+    background:var(--accent-wash);color:var(--accent-d);
+  }
+  .mega .card-opt h4{
+    margin:0;font-size:17px;font-weight:600;color:var(--ink);
+    letter-spacing:-.01em;
+  }
+  .mega .card-opt p{margin:0;font-size:13px;color:var(--ink-3);line-height:1.5}
+
+  /* sub group containers (conditional reveal) */
+  .conditional{display:none;animation:slidein .35s ease}
+  .conditional.show{display:block}
+  @keyframes slidein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .sub-block{
+    background:var(--bg);
+    border:1px dashed var(--line-2);
+    border-radius:var(--radius-sm);
+    padding:18px 18px 4px;
+    margin-bottom:22px;
+  }
+  .sub-block-head{
+    display:flex;align-items:center;gap:10px;
+    font-size:11.5px;letter-spacing:.18em;
+    color:var(--accent-d);font-weight:700;
+    text-transform:uppercase;margin-bottom:14px;
+  }
+  .sub-block-head::before{
+    content:"";width:14px;height:1px;background:var(--accent);
+  }
+  .sub-block .field:last-of-type{margin-bottom:18px}
+
+  /* checkbox row */
+  .check-row{
+    display:flex;align-items:flex-start;gap:12px;
+    padding:14px 16px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:var(--radius-sm);
+    margin-top:14px;
+  }
+  .check-row input{
+    appearance:none;-webkit-appearance:none;
+    width:18px;height:18px;flex:0 0 18px;
+    border:1.5px solid var(--line-2);background:var(--paper);
+    border-radius:4px;cursor:pointer;
+    margin-top:1px;
+    position:relative;transition:all .15s;
+  }
+  .check-row input:checked{background:var(--ink);border-color:var(--ink)}
+  .check-row input:checked::after{
+    content:"";position:absolute;inset:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'><path d='M4 9.3l3.3 3.3L14 5.6' stroke='%23fbf8f2' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  }
+  .check-row label{font-size:13.5px;color:var(--ink-2);line-height:1.55}
+  .check-row label b{font-weight:600;color:var(--ink)}
+  .check-row .terms-link{color:var(--accent-d);text-decoration:underline;text-underline-offset:2px}
+
+  /* nav buttons */
+  .form-nav{
+    display:flex;justify-content:space-between;align-items:center;
+    border-top:1px solid var(--line);
+    margin-top:24px;padding-top:22px;
+  }
+  .form-nav .left{display:flex;gap:10px;align-items:center}
+  .btn-secondary{
+    background:transparent;color:var(--ink-2);
+    padding:13px 22px;border-radius:999px;
+    border:1px solid var(--line-2);
+    font-size:13.5px;font-weight:600;
+  }
+  .btn-secondary:hover{background:var(--bg);border-color:var(--ink-4)}
+  .btn-secondary[disabled]{opacity:.4;cursor:not-allowed}
+  .btn-next{
+    padding:14px 26px;border-radius:999px;
+    background:var(--ink);color:var(--paper);
+    border:none;font-weight:600;font-size:14px;
+    display:inline-flex;align-items:center;gap:10px;
+  }
+  .btn-next:hover{background:#1c1916}
+  .btn-next svg{transition:transform .2s}
+  .btn-next:hover svg{transform:translateX(3px)}
+  .btn-submit{
+    background:var(--accent-d);color:var(--paper);
+  }
+  .btn-submit:hover{background:var(--accent)}
+  .save-note{font-size:12px;color:var(--ink-4);letter-spacing:.02em}
+
+  /* success state */
+  .success{
+    display:none;text-align:center;padding:50px 20px 30px;
+  }
+  .success.show{display:block;animation:fadeIn .4s ease}
+  .success .check{
+    width:64px;height:64px;border-radius:50%;
+    background:var(--accent-wash);
+    margin:0 auto 22px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--accent-d);
+  }
+  .success h3{
+    font-size:28px;font-weight:600;letter-spacing:-.02em;
+    margin:0 0 12px;
+  }
+  .success h3 em{font-weight:600;color:var(--accent-d)}
+  .success p{color:var(--ink-3);max-width:420px;margin:0 auto 12px;text-wrap:pretty}
+
+  /* footer */
+  .footer{
+    background:#1f1c19;color:#a99e8e;
+    padding:56px 28px 32px;
+  }
+  .footer-inner{
+    max-width:1240px;margin:0 auto;
+    display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;
+  }
+  @media (max-width:780px){.footer-inner{grid-template-columns:1fr 1fr}}
+  @media (max-width:480px){.footer-inner{grid-template-columns:1fr}}
+  .footer .brand{color:#f1e7d4;font-size:18px;letter-spacing:.18em}
+  .footer .brand .dot{background:var(--accent-l)}
+  .footer .brand-mark{
+    background:var(--paper);color:var(--ink);
+  }
+  .footer .brand-kr{
+    color:#f1e7d4;font-size:18px;letter-spacing:-.02em;
+  }
+  .footer .brand-en{
+    color:#a99e8e;border-color:rgba(247,242,230,.2);
+  }
+  .footer .brand-en em{color:#d6c4a4}
+  .footer-blurb{
+    font-size:13.5px;line-height:1.7;color:#a99e8e;
+    margin:14px 0 0;max-width:300px;
+  }
+  .footer h5{
+    font-size:11px;letter-spacing:.28em;
+    text-transform:uppercase;color:#d6c4a4;
+    margin:0 0 16px;font-weight:600;
+  }
+  .footer ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:13px}
+  .footer ul a{color:#a99e8e;text-decoration:none}
+  .footer ul a:hover{color:#f1e7d4}
+  .footer-bottom{
+    max-width:1240px;margin:36px auto 0;padding-top:24px;
+    border-top:1px solid #2f2a25;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+    font-size:12px;color:#7c7264;letter-spacing:.02em;
+  }
+  .footer-bottom .legal{display:flex;gap:18px}
+  .footer-bottom .legal a{color:#a99e8e;text-decoration:none}
+  .footer-bottom .legal a:hover{color:#f1e7d4}
+
+  /* responsive form layout */
+  @media (max-width:980px){
+    .form-section{grid-template-columns:1fr;gap:28px;padding:48px 22px 70px}
+    .side{position:static;top:auto}
+    .stepper{display:none}
+    .form-card{padding:28px 24px 22px}
+    .step-title{font-size:22px}
+  }
+  @media (max-width:520px){
+    .form-card{padding:22px 18px 18px;border-radius:12px}
+    .form-nav{flex-direction:column-reverse;align-items:stretch;gap:10px}
+    .form-nav .left,.form-nav .right{width:100%;display:flex}
+    .btn-next,.btn-secondary{width:100%;justify-content:center}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============== NAV ============== -->
+<nav class="nav" aria-label="주 메뉴">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="맴맴곳곳 디자인랩">
+      <img class="brand-wordmark" src="assets/mmgg-wordmark.png" alt="MMGG"/>
+      <span class="brand-en">
+        <em>Design Lab</em>
+        Incheon · Since 2021
+      </span>
+    </a>
+    <div class="nav-links" role="navigation">
+      <a href="#about">About</a>
+      <a href="#works">Project</a>
+      <a href="#journal">Media</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <button class="nav-cta" type="button" onclick="document.getElementById('consult').scrollIntoView({behavior:'smooth',block:'start'})">
+      Consult
+    </button>
+  </div>
+</nav>
+
+<!-- ============== HERO ============== -->
+<header class="hero" id="top">
+  <div class="hero-meta">
+        <span class="num-tag">
+      No. 001 · <img class="brand-wordmark" src="assets/mmgg-wordmark.png" alt="MMGG" style="height:14px;display:inline-block;vertical-align:-2px;margin:0 4px 0 2px"/> DESIGN LAB
+    </span>
+    <span class="rule" aria-hidden="true"></span>
+    <span>Incheon · Republic of Korea</span>
+    <span class="rule" aria-hidden="true"></span>
+    <span>2026 — Vol. 05</span>
+  </div>
+
+  <h1 class="display">
+    <span class="line r1">남길 것과</span>
+    <span class="line r2">덜어낼 것을<span class="punc">,</span></span>
+    <span class="line r3">먼저<span class="punc">.</span></span>
+  </h1>
+
+  <p class="hero-subline">
+    설명 없이도 납득되는 공간 — 들어서는 순간 먼저 납득되고, 시간이 지날수록 더 분명해지는 자리를 만듭니다.
+    <span class="en">A space that needs no explanation. It becomes clearer the longer you stay.</span>
+  </p>
+
+  <div class="hero-tags" role="list">
+    <span role="listitem">판단 · Judgment</span>
+    <span role="listitem">질서 · Order</span>
+    <span role="listitem">밀도 · Density</span>
+  </div>
+</header>
+
+<!-- image strip — 4 short construction-work loops (5s each, CSS animated) -->
+<div class="hero-strip" aria-hidden="true">
+
+  <figure class="strip-frame f1">
+    <svg class="loop loop-measure" viewBox="0 0 240 320" preserveAspectRatio="xMidYMid meet">
+      <!-- horizontal axis -->
+      <line class="axis" x1="20" y1="170" x2="220" y2="170"/>
+      <!-- end caps -->
+      <line class="tick" x1="20"  y1="160" x2="20"  y2="180"/>
+      <line class="tick" x1="220" y1="160" x2="220" y2="180"/>
+      <!-- minor ticks -->
+      <line class="tick" x1="60"  y1="166" x2="60"  y2="174"/>
+      <line class="tick" x1="100" y1="166" x2="100" y2="174"/>
+      <line class="tick" x1="140" y1="166" x2="140" y2="174"/>
+      <line class="tick" x1="180" y1="166" x2="180" y2="174"/>
+      <!-- dimension label -->
+      <text class="num" x="120" y="200" text-anchor="middle">2,400 MM</text>
+    </svg>
+    <span class="ord">01</span>
+    <figcaption><span>Measure</span><span class="kr">잰다</span></figcaption>
+  </figure>
+
+  <figure class="strip-frame f2">
+    <svg class="loop loop-draw" viewBox="0 0 240 320" preserveAspectRatio="xMidYMid meet">
+      <!-- L-shaped plan path -->
+      <path class="plan" d="M40 80 L40 200 L160 200 L160 140 L200 140 L200 80 Z"/>
+      <!-- pen tip -->
+      <circle class="pen" cx="0" cy="0" r="2.5"/>
+      <!-- dim label -->
+      <text class="dim" x="120" y="240" text-anchor="middle">PLAN · 25.4 M²</text>
+    </svg>
+    <span class="ord">02</span>
+    <figcaption><span>Draw</span><span class="kr">그린다</span></figcaption>
+  </figure>
+
+  <figure class="strip-frame f3">
+    <svg class="loop loop-level" viewBox="0 0 240 320" preserveAspectRatio="xMidYMid meet">
+      <!-- spirit level body -->
+      <g class="bar">
+        <rect x="30" y="150" width="180" height="36" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <!-- bubble chamber -->
+        <rect x="90" y="160" width="60" height="16" rx="8" fill="none" stroke="currentColor" stroke-width="1"/>
+        <!-- center marks -->
+        <line x1="110" y1="156" x2="110" y2="180" stroke="currentColor" stroke-width=".8"/>
+        <line x1="130" y1="156" x2="130" y2="180" stroke="currentColor" stroke-width=".8"/>
+        <!-- bubble -->
+        <circle class="bubble" cx="120" cy="168" r="5" fill="currentColor" opacity=".75"/>
+      </g>
+      <text class="ok" x="120" y="218" text-anchor="middle">LEVEL · OK</text>
+    </svg>
+    <span class="ord">03</span>
+    <figcaption><span>Level</span><span class="kr">맞춘다</span></figcaption>
+  </figure>
+
+  <figure class="strip-frame f4">
+    <svg class="loop loop-finish" viewBox="0 0 240 320" preserveAspectRatio="none">
+      <!-- vertical grain lines -->
+      <g class="grain">
+        <line x1="20"  y1="20" x2="20"  y2="300"/>
+        <line x1="35"  y1="20" x2="35"  y2="300"/>
+        <line x1="52"  y1="20" x2="52"  y2="300"/>
+        <line x1="70"  y1="20" x2="70"  y2="300"/>
+        <line x1="84"  y1="20" x2="84"  y2="300"/>
+        <line x1="100" y1="20" x2="100" y2="300"/>
+        <line x1="118" y1="20" x2="118" y2="300"/>
+        <line x1="135" y1="20" x2="135" y2="300"/>
+        <line x1="152" y1="20" x2="152" y2="300"/>
+        <line x1="168" y1="20" x2="168" y2="300"/>
+        <line x1="184" y1="20" x2="184" y2="300"/>
+        <line x1="200" y1="20" x2="200" y2="300"/>
+        <line x1="218" y1="20" x2="218" y2="300"/>
+      </g>
+      <!-- sanding block sweep -->
+      <g class="sweep">
+        <rect x="0" y="120" width="60" height="80" fill="currentColor" opacity=".18" rx="2"/>
+        <rect x="6" y="124" width="48" height="72" fill="none" stroke="currentColor" stroke-width="1" opacity=".5"/>
+      </g>
+      <text class="label" x="120" y="246" text-anchor="middle">FINISH · 320 GRIT</text>
+    </svg>
+    <span class="ord">04</span>
+    <figcaption><span>Finish</span><span class="kr">마무리한다</span></figcaption>
+  </figure>
+
+</div>
+
+<!-- ============== STATEMENT ============== -->
+<section class="statement" id="about">
+  <div>
+    <span class="statement-label">About — 01 / 04</span>
+    <div class="statement-meta">
+      <span>Founded 2021</span>
+      <span>Incheon · 홍예문</span>
+      <span>MMGG Design Lab</span>
+    </div>
+  </div>
+  <div class="statement-body">
+    맴맴곳곳은 공간을 덧붙이는 대신,
+    그 안에 <em>남아야 할 것</em>과 <em>덜어내야 할 것</em>을 먼저 들여다봅니다.
+    사람의 머무름과 움직임, 오래 남는 인상과 실제의 쓰임을 함께 읽으며 공간의 방향을 정리합니다.
+    <span class="en">
+      MMGG Design Lab begins not by adding to a space, but by looking at what should remain and what should be taken away. We read the dwelling and the movement of people, the lasting impression and the actual use — and from there, the direction of the space is set.
+    </span>
+  </div>
+</section>
+
+<!-- ============== PILLARS ============== -->
+<section class="pillars" id="works">
+  <div class="pillars-head">
+    <h2>Philosophy</h2>
+    <span class="idx">02 / 04 — 세 가지 태도</span>
+  </div>
+  <div class="pillars-grid">
+    <article class="pillar p1">
+      <div class="pillar-img" role="img" aria-label="남길 것과 덜어낼 것 — 판단">
+        <span class="ord">01</span>
+        <span class="hint">Edit before adding</span>
+      </div>
+      <h3>판단 <small>Judgment</small></h3>
+      <p class="pillar-sub">남길 것과 덜어낼 것을 먼저 정리합니다.</p>
+      <p>좋은 공간은 많은 것을 더하는 데서 시작되지 않습니다. 무엇이 꼭 남아야 하는지, 무엇은 과감히 덜어내야
+         하는지를 분명히 정리할 때 비로소 공간의 방향이 선명해집니다. 취향보다 판단을, 장식보다 구조를 먼저 세웁니다.</p>
+      <p class="en">Direction comes from deciding what to keep and what to remove. Judgment before taste, structure before ornament.</p>
+    </article>
+
+    <article class="pillar p2">
+      <div class="pillar-img" role="img" aria-label="쓰임과 인상 — 균형">
+        <span class="ord">02</span>
+        <span class="hint">Use &amp; Impression, inseparable</span>
+      </div>
+      <h3>균형 <small>Balance</small></h3>
+      <p class="pillar-sub">쓰임과 인상은 함께 가야 한다고 생각합니다.</p>
+      <p>공간은 보기 좋기만 해서는 오래 남지 못합니다. 실제로 편하게 쓰여야 하고, 동시에 그 공간만의 인상이 자연스럽게
+         남아야 합니다. 기능과 감각, 운영과 분위기, 현실과 완성도가 분리되지 않는 상태를 지향합니다.</p>
+      <p class="en">A space must work first, and leave an impression that is its own. Function and feel kept inseparable.</p>
+    </article>
+
+    <article class="pillar p3">
+      <div class="pillar-img" role="img" aria-label="과장보다 질서, 장식보다 밀도">
+        <span class="ord">03</span>
+        <span class="hint">Order over gesture</span>
+      </div>
+      <h3>밀도 <small>Density</small></h3>
+      <p class="pillar-sub">과장보다 질서, 장식보다 밀도를 중요하게 생각합니다.</p>
+      <p>공간의 힘은 큰 제스처보다 정리된 흐름에서 나옵니다. 분명한 동선, 균형 있는 비례, 절제된 재료와 디테일은 공간을
+         더 오래 보게 만들고 더 깊게 이해하게 만듭니다. 눈길을 끄는 장면보다 오래 남는 밀도를 만드는 데 집중합니다.</p>
+      <p class="en">A room’s strength is in the order of its flow, not the size of its gesture. We design for density that lasts.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ============== APPROACH (4-step process) ============== -->
+<section class="approach" id="approach">
+  <div class="approach-inner">
+    <div class="approach-head">
+      <h2>Approach <em>— 읽고, 편집하고, 조형하고, 완성합니다.</em></h2>
+      <span class="idx">03 / 04 — Process</span>
+    </div>
+    <div class="approach-grid">
+      <article class="approach-step">
+        <div class="step-no">Step 01</div>
+        <h4>Read</h4>
+        <p class="kr">읽습니다</p>
+        <p>장소의 조건을 읽고, 사람의 흐름을 살핍니다. 공간을 이미지로 보기 전에, 그곳이 어떻게 쓰이고 어떤 역할을 가져야 하는지부터 확인합니다.</p>
+      </article>
+      <article class="approach-step">
+        <div class="step-no">Step 02</div>
+        <h4>Edit</h4>
+        <p class="kr">편집합니다</p>
+        <p>남길 것과 덜어낼 것을 정리합니다. 프로그램, 동선, 구조, 재료, 예산, 운영의 현실까지 함께 검토하며 공간의 우선순위를 다시 세웁니다.</p>
+      </article>
+      <article class="approach-step">
+        <div class="step-no">Step 03</div>
+        <h4>Shape</h4>
+        <p class="kr">조형합니다</p>
+        <p>정리된 판단을 공간의 형태로 구체화합니다. 비례와 동선, 재료와 빛, 분위기와 기능이 서로 어긋나지 않도록 조정하며 가장 분명한 해법으로 다듬습니다.</p>
+      </article>
+      <article class="approach-step">
+        <div class="step-no">Step 04</div>
+        <h4>Complete</h4>
+        <p class="kr">완성합니다</p>
+        <p>처음의 생각이 마지막 결과까지 흐트러지지 않도록 끝까지 밀고 갑니다. 설계와 협의, 시공과 마감의 전 과정을 일관된 태도로 연결합니다.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============== BAND ============== -->
+<div class="band">
+  <div class="band-inner">
+    <div class="ticker">
+      <span class="live">Now Booking</span>
+      <span class="msg"><b>이번 분기 4팀</b> 한정 · 평균 회신 24시간 · 첫 미팅은 인천 홍예문 작업실</span>
+    </div>
+    <div class="pill-row">
+      <span class="pill">Residential</span>
+      <span class="pill">F&amp;B</span>
+      <span class="pill">Retail</span>
+      <span class="pill">Office</span>
+    </div>
+    <span></span>
+    <div class="pill-row"></div>
+  </div>
+</div>
+
+<!-- ============== FORM ============== -->
+<section class="form-section" id="consult">
+  <aside class="side">
+    <span class="eyebrow">CONSULTATION — 04 / 04</span>
+    <h2>먼저, <em>남길 것과 덜어낼 것</em>부터<br/>함께 정리해볼까요?</h2>
+    <p>총 7단계, 대부분 선택형 질문입니다. 답변을 토대로 맴맴곳곳이 평균 24시간 안에 
+       리서치 노트와 함께 첫 회신을 보내드립니다.</p>
+    <ol class="stepper" id="stepper">
+      <li data-step="1"><span class="num">01</span><span class="name">기본 정보</span></li>
+      <li data-step="2"><span class="num">02</span><span class="name">예산</span></li>
+      <li data-step="3"><span class="num">03</span><span class="name">일정</span></li>
+      <li data-step="4"><span class="num">04</span><span class="name">디자인 취향</span></li>
+      <li data-step="5"><span class="num">05</span><span class="name">기능 · 구조</span></li>
+      <li data-step="6"><span class="num">06</span><span class="name">라이프스타일</span></li>
+      <li data-step="7"><span class="num">07</span><span class="name">마무리</span></li>
+    </ol>
+  </aside>
+
+  <form class="form-card" id="consult-form" novalidate>
+    <div class="form-head">
+      <div>
+        <div class="step-label" id="step-label">STEP 01 · 기본 정보</div>
+        <h3 class="step-title" id="step-title">먼저, 어떻게 <em>불러드릴까요?</em></h3>
+        <p class="step-sub" id="step-sub">주거든 상업이든, 어떤 공간을 그리고 계신지 함께 알려주세요.</p>
+      </div>
+      <div class="step-counter"><span id="step-counter">01</span> / 07</div>
+    </div>
+
+    <!-- ====== STEP 1 ====== -->
+    <fieldset class="step active" data-step="1">
+      <div class="field-row">
+        <div class="field">
+          <label class="label" for="f-name">성함 / 담당자 <span class="req" aria-hidden="true">*</span></label>
+          <input class="input" id="f-name" name="name" type="text" required placeholder="예) 김지윤" autocomplete="name"/>
+          <div class="error-msg">성함을 입력해 주세요.</div>
+        </div>
+        <div class="field">
+          <label class="label" for="f-phone">연락처 <span class="req" aria-hidden="true">*</span></label>
+          <input class="input" id="f-phone" name="phone" type="tel" required placeholder="010-0000-0000" autocomplete="tel"/>
+          <div class="error-msg">정확한 연락처를 입력해 주세요.</div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="label" for="f-email">이메일 <span class="opt">선택</span></label>
+          <input class="input" id="f-email" name="email" type="email" placeholder="hello@mmggdesignlab.com" autocomplete="email"/>
+          <div class="error-msg">이메일 형식을 확인해 주세요.</div>
+        </div>
+        <div class="field">
+          <label class="label" for="f-address">시공 주소 <span class="req" aria-hidden="true">*</span></label>
+          <input class="input" id="f-address" name="address" type="text" required placeholder="시·구·동 정도면 충분해요"/>
+          <div class="error-msg">시공 예정 지역을 알려주세요.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">공간 유형 <span class="req" aria-hidden="true">*</span></label>
+        <div class="mega" data-group="category" data-required="true" data-type="single">
+          <label class="card-opt" data-value="residential">
+            <input type="radio" name="category" value="residential" required />
+            <span class="big-ico" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M3.5 11L12 4l8.5 7v9a1 1 0 0 1-1 1h-4.5v-6h-6v6H4.5a1 1 0 0 1-1-1v-9z"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <h4>주거 공간</h4>
+            <p>아파트 · 빌라 · 단독주택 · 오피스텔</p>
+          </label>
+          <label class="card-opt" data-value="commercial">
+            <input type="radio" name="category" value="commercial" required />
+            <span class="big-ico" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M3 9l1.5-4h15L21 9M3 9v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9M3 9h18M9 14h6"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <h4>상업 공간</h4>
+            <p>카페 · 매장 · 오피스 · 클리닉 외</p>
+          </label>
+        </div>
+        <div class="error-msg">공간 유형을 선택해 주세요.</div>
+      </div>
+
+      <!-- Conditional: residential subtype -->
+      <div class="conditional" data-for="residential">
+        <div class="field">
+          <label class="label">세부 유형 <span class="req" aria-hidden="true">*</span></label>
+          <div class="cards" data-group="subtype_residential" data-required="true" data-type="single">
+            <label class="card-opt"><input type="radio" name="subtype_residential" value="apartment"/><span>아파트</span></label>
+            <label class="card-opt"><input type="radio" name="subtype_residential" value="villa"/><span>빌라 · 다세대</span></label>
+            <label class="card-opt"><input type="radio" name="subtype_residential" value="house"/><span>단독주택</span></label>
+            <label class="card-opt"><input type="radio" name="subtype_residential" value="officetel"/><span>오피스텔</span></label>
+          </div>
+          <div class="error-msg">세부 유형을 선택해 주세요.</div>
+        </div>
+      </div>
+
+      <!-- Conditional: commercial subtype -->
+      <div class="conditional" data-for="commercial">
+        <div class="field">
+          <label class="label">세부 유형 <span class="req" aria-hidden="true">*</span></label>
+          <div class="chips" data-group="subtype_commercial" data-required="true" data-type="single">
+            <label class="chip"><input type="radio" name="subtype_commercial" value="cafe"/><span>카페 · 디저트</span></label>
+            <label class="chip"><input type="radio" name="subtype_commercial" value="restaurant"/><span>음식점 · 주점</span></label>
+            <label class="chip"><input type="radio" name="subtype_commercial" value="retail"/><span>매장 · 리테일</span></label>
+            <label class="chip"><input type="radio" name="subtype_commercial" value="office"/><span>사무실 · 오피스</span></label>
+            <label class="chip"><input type="radio" name="subtype_commercial" value="beauty"/><span>미용 · 뷰티</span></label>
+            <label class="chip"><input type="radio" name="subtype_commercial" value="clinic"/><span>병원 · 클리닉</span></label>
+            <label class="chip"><input type="radio" name="subtype_commercial" value="academy"/><span>학원 · 교육</span></label>
+            <label class="chip"><input type="radio" name="subtype_commercial" value="studio"/><span>스튜디오</span></label>
+            <label class="chip"><input type="radio" name="subtype_commercial" value="fitness"/><span>피트니스 · 요가</span></label>
+            <label class="chip"><input type="radio" name="subtype_commercial" value="lodging"/><span>숙박</span></label>
+            <label class="chip"><input type="radio" name="subtype_commercial" value="etc"/><span>기타</span></label>
+          </div>
+          <div class="error-msg">세부 유형을 선택해 주세요.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">평수 <span class="req" aria-hidden="true">*</span></label>
+        <div class="chips" data-group="area" data-required="true" data-type="single">
+          <label class="chip"><input type="radio" name="area" value="~10"/><span>~10평</span></label>
+          <label class="chip"><input type="radio" name="area" value="11-20"/><span>11–20평</span></label>
+          <label class="chip"><input type="radio" name="area" value="21-30"/><span>21–30평</span></label>
+          <label class="chip"><input type="radio" name="area" value="31-50"/><span>31–50평</span></label>
+          <label class="chip"><input type="radio" name="area" value="51-100"/><span>51–100평</span></label>
+          <label class="chip"><input type="radio" name="area" value="100+"/><span>100평+</span></label>
+        </div>
+        <div class="error-msg">평수를 선택해 주세요.</div>
+      </div>
+    </fieldset>
+
+    <!-- ====== STEP 2 ====== -->
+    <fieldset class="step" data-step="2">
+      <div class="field">
+        <label class="label">총 예산 <span class="req" aria-hidden="true">*</span></label>
+        <div class="cards" data-group="budget" data-required="true" data-type="single">
+          <label class="card-opt"><input type="radio" name="budget" value="~2000"/><span>~2천만원</span></label>
+          <label class="card-opt"><input type="radio" name="budget" value="2000-4000"/><span>2–4천</span></label>
+          <label class="card-opt"><input type="radio" name="budget" value="4000-7000"/><span>4–7천</span></label>
+          <label class="card-opt"><input type="radio" name="budget" value="7000-10000"/><span>7천–1억</span></label>
+          <label class="card-opt"><input type="radio" name="budget" value="1-2eok"/><span>1–2억</span></label>
+          <label class="card-opt"><input type="radio" name="budget" value="2eok+"/><span>2억+</span></label>
+          <label class="card-opt"><input type="radio" name="budget" value="undecided"/><span>미정 · 상담 후</span></label>
+        </div>
+        <div class="error-msg">예산 범위를 선택해 주세요.</div>
+      </div>
+
+      <!-- Residential: 가구/가전 포함 -->
+      <div class="conditional" data-for="residential">
+        <div class="sub-block">
+          <div class="sub-block-head">주거 · 추가 정보</div>
+          <div class="field">
+            <label class="label">가구 / 가전 포함 여부</label>
+            <div class="cards" data-group="furniture_res" data-type="single">
+              <label class="card-opt"><input type="radio" name="furniture_res" value="all"/><span>포함</span></label>
+              <label class="card-opt"><input type="radio" name="furniture_res" value="some"/><span>일부 포함</span></label>
+              <label class="card-opt"><input type="radio" name="furniture_res" value="none"/><span>미포함</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">투자 우선순위 <span class="opt">중복 선택</span></label>
+            <div class="chips" data-group="priority_res" data-type="multi">
+              <label class="chip"><input type="checkbox" name="priority_res" value="kitchen"/><span>주방</span></label>
+              <label class="chip"><input type="checkbox" name="priority_res" value="bath"/><span>욕실</span></label>
+              <label class="chip"><input type="checkbox" name="priority_res" value="living"/><span>거실</span></label>
+              <label class="chip"><input type="checkbox" name="priority_res" value="bedroom"/><span>침실</span></label>
+              <label class="chip"><input type="checkbox" name="priority_res" value="storage"/><span>수납 · 드레스룸</span></label>
+              <label class="chip"><input type="checkbox" name="priority_res" value="lighting"/><span>조명</span></label>
+              <label class="chip"><input type="checkbox" name="priority_res" value="floor"/><span>바닥</span></label>
+              <label class="chip"><input type="checkbox" name="priority_res" value="window"/><span>창호</span></label>
+              <label class="chip"><input type="checkbox" name="priority_res" value="balcony"/><span>발코니</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Commercial: 가구/집기/장비 포함 -->
+      <div class="conditional" data-for="commercial">
+        <div class="sub-block">
+          <div class="sub-block-head">상업 · 추가 정보</div>
+          <div class="field">
+            <label class="label">가구 / 집기 / 장비 포함 여부</label>
+            <div class="cards" data-group="furniture_com" data-type="single">
+              <label class="card-opt"><input type="radio" name="furniture_com" value="all"/><span>모두 포함</span></label>
+              <label class="card-opt"><input type="radio" name="furniture_com" value="some"/><span>일부 포함</span></label>
+              <label class="card-opt"><input type="radio" name="furniture_com" value="none"/><span>시공만</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">투자 우선순위 <span class="opt">중복 선택</span></label>
+            <div class="chips" data-group="priority_com" data-type="multi">
+              <label class="chip"><input type="checkbox" name="priority_com" value="facade"/><span>파사드 · 입구</span></label>
+              <label class="chip"><input type="checkbox" name="priority_com" value="signage"/><span>간판 · 사이니지</span></label>
+              <label class="chip"><input type="checkbox" name="priority_com" value="counter"/><span>카운터 · POS</span></label>
+              <label class="chip"><input type="checkbox" name="priority_com" value="seating"/><span>객석 · 홀</span></label>
+              <label class="chip"><input type="checkbox" name="priority_com" value="kitchen"/><span>주방 · 조리공간</span></label>
+              <label class="chip"><input type="checkbox" name="priority_com" value="restroom"/><span>화장실</span></label>
+              <label class="chip"><input type="checkbox" name="priority_com" value="lighting"/><span>조명</span></label>
+              <label class="chip"><input type="checkbox" name="priority_com" value="display"/><span>진열 · 디스플레이</span></label>
+              <label class="chip"><input type="checkbox" name="priority_com" value="photo"/><span>포토스팟</span></label>
+              <label class="chip"><input type="checkbox" name="priority_com" value="staff"/><span>직원공간 · 창고</span></label>
+              <label class="chip"><input type="checkbox" name="priority_com" value="bi"/><span>브랜드 아이덴티티</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- ====== STEP 3 ====== -->
+    <fieldset class="step" data-step="3">
+      <div class="field-row">
+        <div class="field">
+          <label class="label" for="f-start">희망 공사 시작일 <span class="req" aria-hidden="true">*</span></label>
+          <input class="input" type="date" id="f-start" name="start_date" required />
+          <div class="error-msg">희망 시작일을 선택해 주세요.</div>
+        </div>
+        <div class="field">
+          <label class="label" for="f-target">
+            <span class="branch-label" data-res="입주 희망일" data-com="오픈 희망일">입주 / 오픈 희망일</span>
+          </label>
+          <input class="input" type="date" id="f-target" name="target_date" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">일정 유연성 <span class="req" aria-hidden="true">*</span></label>
+        <div class="cards" data-group="flex" data-required="true" data-type="single">
+          <label class="card-opt"><input type="radio" name="flex" value="fixed"/><span>고정</span></label>
+          <label class="card-opt"><input type="radio" name="flex" value="2w"/><span>2주 내외</span></label>
+          <label class="card-opt"><input type="radio" name="flex" value="loose"/><span>유연함</span></label>
+        </div>
+        <div class="error-msg">일정 유연성을 선택해 주세요.</div>
+      </div>
+
+      <div class="conditional" data-for="commercial">
+        <div class="sub-block">
+          <div class="sub-block-head">상업 전용</div>
+          <div class="field" style="margin-bottom:18px">
+            <label class="label">영업 중단 가능 여부</label>
+            <div class="cards" data-group="suspend" data-type="single">
+              <label class="card-opt"><input type="radio" name="suspend" value="new"/><span>해당 없음 (신규)</span></label>
+              <label class="card-opt"><input type="radio" name="suspend" value="full"/><span>전체 휴업 가능</span></label>
+              <label class="card-opt"><input type="radio" name="suspend" value="partial"/><span>부분 영업 유지</span></label>
+              <label class="card-opt"><input type="radio" name="suspend" value="night"/><span>야간 시공</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- ====== STEP 4 ====== -->
+    <fieldset class="step" data-step="4">
+      <div class="field">
+        <label class="label">선호 스타일 <span class="opt">중복 선택</span></label>
+        <div class="cards" data-group="style" data-type="multi">
+          <label class="card-opt"><input type="checkbox" name="style" value="modern"/><span>모던 미니멀</span></label>
+          <label class="card-opt"><input type="checkbox" name="style" value="warm"/><span>웜톤 내추럴</span></label>
+          <label class="card-opt"><input type="checkbox" name="style" value="classic"/><span>클래식 럭셔리</span></label>
+          <label class="card-opt"><input type="checkbox" name="style" value="nordic"/><span>북유럽</span></label>
+          <label class="card-opt"><input type="checkbox" name="style" value="industrial"/><span>인더스트리얼</span></label>
+          <label class="card-opt"><input type="checkbox" name="style" value="hanok"/><span>한옥풍</span></label>
+          <label class="card-opt"><input type="checkbox" name="style" value="vintage"/><span>빈티지 · 레트로</span></label>
+          <label class="card-opt"><input type="checkbox" name="style" value="trendy"/><span>트렌디 · SNS</span></label>
+          <label class="card-opt"><input type="checkbox" name="style" value="maximal"/><span>맥시멀</span></label>
+          <label class="card-opt"><input type="checkbox" name="style" value="unsure"/><span>모르겠어요</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">컬러 톤 <span class="opt">중복 선택</span></label>
+        <div class="swatches" data-group="color" data-type="multi">
+          <label class="swatch"><input type="checkbox" name="color" value="ivory"/><span class="sw" style="background:#f3ead7"></span><span>아이보리</span></label>
+          <label class="swatch"><input type="checkbox" name="color" value="warmwhite"/><span class="sw" style="background:#fbf5ec"></span><span>웜 화이트</span></label>
+          <label class="swatch"><input type="checkbox" name="color" value="wood"/><span class="sw" style="background:#b89270"></span><span>우드 톤</span></label>
+          <label class="swatch"><input type="checkbox" name="color" value="bronze"/><span class="sw" style="background:#7a5a3a"></span><span>딥 브라운</span></label>
+          <label class="swatch"><input type="checkbox" name="color" value="charcoal"/><span class="sw" style="background:#3a3733"></span><span>차콜</span></label>
+          <label class="swatch"><input type="checkbox" name="color" value="greige"/><span class="sw" style="background:#b8ad9b"></span><span>그레이지</span></label>
+          <label class="swatch"><input type="checkbox" name="color" value="moss"/><span class="sw" style="background:#6f7558"></span><span>모스 그린</span></label>
+          <label class="swatch"><input type="checkbox" name="color" value="terracotta"/><span class="sw" style="background:#b3654a"></span><span>테라코타</span></label>
+          <label class="swatch"><input type="checkbox" name="color" value="blue"/><span class="sw" style="background:#3a526b"></span><span>딥 블루</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">분위기 키워드 <span class="opt">중복 선택</span></label>
+        <div class="chips" data-group="mood" data-type="multi">
+          <label class="chip"><input type="checkbox" name="mood" value="cozy"/><span>포근한</span></label>
+          <label class="chip"><input type="checkbox" name="mood" value="calm"/><span>차분한</span></label>
+          <label class="chip"><input type="checkbox" name="mood" value="refined"/><span>세련된</span></label>
+          <label class="chip"><input type="checkbox" name="mood" value="bright"/><span>밝은</span></label>
+          <label class="chip"><input type="checkbox" name="mood" value="luxe"/><span>고급스러운</span></label>
+          <label class="chip"><input type="checkbox" name="mood" value="unique"/><span>개성있는</span></label>
+          <label class="chip"><input type="checkbox" name="mood" value="sensible"/><span>감각적인</span></label>
+          <label class="chip"><input type="checkbox" name="mood" value="comfy"/><span>편안한</span></label>
+          <label class="chip"><input type="checkbox" name="mood" value="lively"/><span>활기찬</span></label>
+          <label class="chip"><input type="checkbox" name="mood" value="pro"/><span>프로페셔널한</span></label>
+        </div>
+      </div>
+
+      <div class="conditional" data-for="commercial">
+        <div class="field">
+          <label class="label" for="f-bi">브랜드 아이덴티티 자료 <span class="opt">선택</span></label>
+          <textarea class="textarea" id="f-bi" name="bi"
+            placeholder="BI 가이드 / 브랜드 컬러 / 로고 파일 링크를 자유롭게 적어주세요 (Notion, Google Drive 등)"></textarea>
+          <div class="uploader" data-uploader="bi_files">
+            <label class="uploader-cta">
+              <span class="lead">
+                <span class="ico" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </span>
+                <span>파일도 함께 첨부하기</span>
+              </span>
+              <span class="hint">로고 · 가이드 PDF · 이미지</span>
+              <input type="file" name="bi_files" multiple
+                accept="image/*,.pdf,.ai,.psd,.sketch,.fig,.zip,.eps"/>
+            </label>
+            <ul class="uploader-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="f-inspo">영감 소스 <span class="opt">선택</span></label>
+        <textarea class="textarea" id="f-inspo" name="inspiration"
+          placeholder="핀터레스트 · 인스타그램 · 이미지 링크 등 — 좋아하는 무드를 알려주시면 큰 도움이 됩니다."></textarea>
+        <div class="uploader" data-uploader="inspiration_files">
+          <label class="uploader-cta">
+            <span class="lead">
+              <span class="ico" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </span>
+              <span>이미지 첨부하기</span>
+            </span>
+            <span class="hint">이미지 · 스크린샷 · 핀 저장파일</span>
+            <input type="file" name="inspiration_files" multiple
+              accept="image/*,.pdf,.heic,.heif"/>
+          </label>
+          <ul class="uploader-list"></ul>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- ====== STEP 5 ====== -->
+    <fieldset class="step" data-step="5">
+      <div class="conditional" data-for="residential">
+        <div class="field">
+          <label class="label">필요한 기능 <span class="opt">중복 선택</span></label>
+          <div class="chips" data-group="features_res" data-type="multi">
+            <label class="chip"><input type="checkbox" name="features_res" value="storage"/><span>대형수납</span></label>
+            <label class="chip"><input type="checkbox" name="features_res" value="office"/><span>홈오피스</span></label>
+            <label class="chip"><input type="checkbox" name="features_res" value="island"/><span>아일랜드 주방</span></label>
+            <label class="chip"><input type="checkbox" name="features_res" value="dress"/><span>드레스룸</span></label>
+            <label class="chip"><input type="checkbox" name="features_res" value="pantry"/><span>펜트리</span></label>
+            <label class="chip"><input type="checkbox" name="features_res" value="smart"/><span>스마트홈</span></label>
+            <label class="chip"><input type="checkbox" name="features_res" value="indirect"/><span>간접조명</span></label>
+            <label class="chip"><input type="checkbox" name="features_res" value="bigbath"/><span>대형 욕실</span></label>
+            <label class="chip"><input type="checkbox" name="features_res" value="kids"/><span>키즈존</span></label>
+            <label class="chip"><input type="checkbox" name="features_res" value="pet"/><span>펫 친화</span></label>
+            <label class="chip"><input type="checkbox" name="features_res" value="homebar"/><span>홈바</span></label>
+            <label class="chip"><input type="checkbox" name="features_res" value="homegym"/><span>홈짐</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="conditional" data-for="commercial">
+        <div class="field">
+          <label class="label">필요한 기능 <span class="opt">중복 선택</span></label>
+          <div class="chips" data-group="features_com" data-type="multi">
+            <label class="chip"><input type="checkbox" name="features_com" value="counter"/><span>카운터 · POS</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="kitchen"/><span>주방 · 조리시설</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="fridge"/><span>냉장 · 냉동</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="restroom"/><span>화장실 신설</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="storage"/><span>창고 · 백야드</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="display"/><span>진열 · 디스플레이</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="sign"/><span>간판</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="photo"/><span>포토존</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="audio"/><span>음향</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="lightplay"/><span>조명 연출</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="vent"/><span>환기 · 배기</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="util"/><span>가스 · 전기 증설</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="hvac"/><span>냉난방</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="kiosk"/><span>키오스크 · 무인화</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="wifi"/><span>와이파이</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="cctv"/><span>CCTV</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="fitting"/><span>피팅룸</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="waiting"/><span>웨이팅 공간</span></label>
+            <label class="chip"><input type="checkbox" name="features_com" value="acc"/><span>장애인 편의시설</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">구조 변경 의향 <span class="req" aria-hidden="true">*</span></label>
+        <div class="cards" data-group="structure" data-required="true" data-type="single">
+          <label class="card-opt"><input type="radio" name="structure" value="none"/><span>변경 없음</span></label>
+          <label class="card-opt"><input type="radio" name="structure" value="partial"/><span>일부 변경</span></label>
+          <label class="card-opt"><input type="radio" name="structure" value="full"/><span>전체 변경</span></label>
+          <label class="card-opt"><input type="radio" name="structure" value="ask"/><span>상담 후 결정</span></label>
+        </div>
+        <div class="error-msg">구조 변경 의향을 선택해 주세요.</div>
+      </div>
+
+      <div class="conditional" data-for="commercial">
+        <div class="field">
+          <label class="label">현재 공간 상태</label>
+          <div class="cards" data-group="space_state" data-type="single">
+            <label class="card-opt"><input type="radio" name="space_state" value="raw"/><span>공실 · 골조</span></label>
+            <label class="card-opt"><input type="radio" name="space_state" value="demo"/><span>철거 필요</span></label>
+            <label class="card-opt"><input type="radio" name="space_state" value="partial"/><span>부분 리모델링</span></label>
+            <label class="card-opt"><input type="radio" name="space_state" value="new"/><span>신축 인테리어</span></label>
+            <label class="card-opt"><input type="radio" name="space_state" value="ops"/><span>운영 중</span></label>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- ====== STEP 6 ====== -->
+    <fieldset class="step" data-step="6">
+      <div class="conditional" data-for="residential">
+        <div class="field">
+          <label class="label">가족 구성원 <span class="opt">중복 선택</span></label>
+          <div class="chips" data-group="household" data-type="multi">
+            <label class="chip"><input type="checkbox" name="household" value="single"/><span>1인</span></label>
+            <label class="chip"><input type="checkbox" name="household" value="newlywed"/><span>신혼</span></label>
+            <label class="chip"><input type="checkbox" name="household" value="baby"/><span>자녀 (영유아)</span></label>
+            <label class="chip"><input type="checkbox" name="household" value="elem"/><span>자녀 (초등)</span></label>
+            <label class="chip"><input type="checkbox" name="household" value="teen"/><span>자녀 (중고+)</span></label>
+            <label class="chip"><input type="checkbox" name="household" value="parents"/><span>부모님 동거</span></label>
+            <label class="chip"><input type="checkbox" name="household" value="pet"/><span>반려동물</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="conditional" data-for="commercial">
+        <div class="field">
+          <label class="label">운영 인원 · 형태 <span class="opt">중복 선택</span></label>
+          <div class="chips" data-group="ops_form" data-type="multi">
+            <label class="chip"><input type="checkbox" name="ops_form" value="solo"/><span>1인 운영</span></label>
+            <label class="chip"><input type="checkbox" name="ops_form" value="2-5"/><span>2–5인</span></label>
+            <label class="chip"><input type="checkbox" name="ops_form" value="6-10"/><span>6–10인</span></label>
+            <label class="chip"><input type="checkbox" name="ops_form" value="11+"/><span>11인+</span></label>
+            <label class="chip"><input type="checkbox" name="ops_form" value="franchise"/><span>프랜차이즈</span></label>
+            <label class="chip"><input type="checkbox" name="ops_form" value="unmanned"/><span>무인 매장</span></label>
+            <label class="chip"><input type="checkbox" name="ops_form" value="booking"/><span>예약제</span></label>
+            <label class="chip"><input type="checkbox" name="ops_form" value="togo"/><span>배달 · 포장 중심</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">예상 일일 방문객</label>
+          <div class="chips" data-group="visitors" data-type="single">
+            <label class="chip"><input type="radio" name="visitors" value="~30"/><span>~30명</span></label>
+            <label class="chip"><input type="radio" name="visitors" value="30-70"/><span>30–70</span></label>
+            <label class="chip"><input type="radio" name="visitors" value="70-150"/><span>70–150</span></label>
+            <label class="chip"><input type="radio" name="visitors" value="150-300"/><span>150–300</span></label>
+            <label class="chip"><input type="radio" name="visitors" value="300+"/><span>300+</span></label>
+            <label class="chip"><input type="radio" name="visitors" value="unknown"/><span>모르겠음</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="f-pain">현재 불편한 점 <span class="opt">선택</span></label>
+        <textarea class="textarea" id="f-pain" name="pain"
+          data-res-ph="예) 거실이 좁고 수납이 부족해요. 주방 동선이 답답합니다."
+          data-com-ph="예) 좌석 회전율이 낮고, 카운터 동선이 자주 막혀요."
+          placeholder="현재 공간에서 불편하신 점을 자유롭게 적어주세요."></textarea>
+        <div class="uploader" data-uploader="pain_files">
+          <label class="uploader-cta">
+            <span class="lead">
+              <span class="ico" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </span>
+              <span>현재 공간 사진 첨부</span>
+            </span>
+            <span class="hint">도면 · 현장 사진 · 짧은 영상</span>
+            <input type="file" name="pain_files" multiple
+              accept="image/*,video/*,.pdf,.heic,.heif"/>
+          </label>
+          <ul class="uploader-list"></ul>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="f-dream">
+          <span class="branch-label" data-res="완성 후 그리는 모습" data-com="오픈 후 그리는 모습">완성 / 오픈 후 그리는 모습</span>
+          <span class="opt">선택</span>
+        </label>
+        <textarea class="textarea" id="f-dream" name="dream"
+          data-res-ph="예) 아침 햇살이 드는 거실에서 가족이 함께 식사하는 모습."
+          data-com-ph="예) 손님이 머무는 시간이 길어지고, 자연스레 사진을 찍게 되는 공간."
+          placeholder="이 공간에서 무엇을 하고 싶은지, 어떤 분위기였으면 하는지 자유롭게 적어주세요."></textarea>
+        <div class="uploader" data-uploader="dream_files">
+          <label class="uploader-cta">
+            <span class="lead">
+              <span class="ico" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </span>
+              <span>레퍼런스 이미지 첨부</span>
+            </span>
+            <span class="hint">닮고 싶은 무드 · 레퍼런스</span>
+            <input type="file" name="dream_files" multiple
+              accept="image/*,.pdf,.heic,.heif"/>
+          </label>
+          <ul class="uploader-list"></ul>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- ====== STEP 7 ====== -->
+    <fieldset class="step" data-step="7">
+      <div class="field">
+        <label class="label">선호 상담 방법 <span class="req" aria-hidden="true">*</span></label>
+        <div class="cards" data-group="contact_pref" data-required="true" data-type="single">
+          <label class="card-opt"><input type="radio" name="contact_pref" value="call"/><span>전화</span></label>
+          <label class="card-opt"><input type="radio" name="contact_pref" value="text"/><span>문자 · 카톡</span></label>
+          <label class="card-opt"><input type="radio" name="contact_pref" value="visit"/><span>방문 상담</span></label>
+          <label class="card-opt"><input type="radio" name="contact_pref" value="video"/><span>화상 상담</span></label>
+        </div>
+        <div class="error-msg">상담 방법을 선택해 주세요.</div>
+      </div>
+
+      <div class="field">
+        <label class="label">시공 경험</label>
+        <div class="chips" data-group="experience" data-type="single">
+          <label class="chip"><input type="radio" name="experience" value="first"/><span>처음이에요</span></label>
+          <label class="chip"><input type="radio" name="experience" value="1-2"/><span>1–2회</span></label>
+          <label class="chip"><input type="radio" name="experience" value="3+"/><span>3회 이상</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="f-notes">자유 요청사항 <span class="opt">선택</span></label>
+        <textarea class="textarea" id="f-notes" name="notes" rows="3"
+          placeholder="추가로 알려주실 점이 있다면 편하게 적어주세요."></textarea>
+      </div>
+
+      <div class="check-row field" id="agree-row">
+        <input type="checkbox" id="agree" name="agree" required />
+        <label for="agree">
+          <b>(필수)</b> 개인정보 수집 · 이용에 동의합니다. —
+          수집 항목 (성함, 연락처, 이메일, 시공 정보) 및 이용 목적 (상담 회신 및 견적 제공)에 동의합니다.
+          <a href="#" class="terms-link" onclick="event.preventDefault();alert('개인정보처리방침 — 데모')">자세히 보기</a>
+        </label>
+        <div class="error-msg" style="margin-left:30px">동의가 필요합니다.</div>
+      </div>
+    </fieldset>
+
+    <!-- ====== SUCCESS STATE ====== -->
+    <div class="success" id="success">
+      <div class="check">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="15" stroke="currentColor" stroke-width="1.4" opacity=".4"/>
+          <path d="M10 16.5l4 4 8.5-8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>접수가 완료되었습니다 — <em>곧 연락드릴게요.</em></h3>
+      <p>전담 디자이너가 답변을 검토하고, 평균 24시간 안에 맞춤 견적과 무드 제안을 보내드립니다.
+         메모해 두신 영감 소스가 있다면 첫 통화에 함께 살펴볼게요.</p>
+      <p style="font-size:13px;color:var(--ink-4)">담당자가 배정되면 연락처로 안내 문자가 발송됩니다.</p>
+    </div>
+
+    <!-- ====== NAV ====== -->
+    <div class="form-nav" id="form-nav">
+      <div class="left">
+        <button type="button" class="btn-secondary" id="prev-btn" disabled>← 이전</button>
+        <span class="save-note">진행 상황은 자동 저장됩니다.</span>
+      </div>
+      <div class="right">
+        <button type="button" class="btn-next" id="next-btn">
+          다음 단계
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </form>
+</section>
+
+<!-- ============== FOOTER ============== -->
+<footer class="footer" id="contact">
+  <div class="footer-inner">
+    <div>
+      <div class="brand brand--footer">
+        <img class="brand-wordmark brand-wordmark--lg brand-wordmark--inv" src="assets/mmgg-wordmark.png" alt="MMGG"/>
+        <span class="brand-en"><em>Design Lab</em>Incheon · Since 2021</span>
+      </div>
+      <p class="footer-blurb">
+        인천에 기반을 둔 크리에이티브 집단. 
+        공간 설계 · 브랜드 · 지역 리서치를 한 호흡으로 풀어냅니다.
+      </p>
+    </div>
+    <div>
+      <h5>Studio</h5>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#works">Project</a></li>
+        <li><a href="#journal">Media</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <ul>
+        <li>인천 중구 홍예문로 58-7</li>
+        <li>T. 010-4089-0654</li>
+        <li><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="97fef9f1f8d7fafaf0f0f3f2e4fef0f9fbf6f5b9f4f8fa">[email&#160;protected]</a></li>
+        <li>평일 10:00 – 19:00</li>
+      </ul>
+    </div>
+    <div>
+      <h5>Legal</h5>
+      <ul>
+        <li>맴맴곳곳 (MMGG DESIGN LAB)</li>
+        <li>사업자 등록번호 710-07-01935</li>
+        <li>대표 이동혁</li>
+        <li>건설업등록 제0000호</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 MMGG Design Lab. All rights reserved.</span>
+    <div class="legal">
+      <a href="#">개인정보처리방침</a>
+      <a href="#">이용약관</a>
+      <a href="#">사업자 정보 확인</a>
+    </div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // ============= CONFIG =============
+  // Google Apps Script 웹 앱 URL — 시트+드라이브 자동 저장.
+  // 배포 후 발급된 'https://script.google.com/macros/s/.../exec' 주소로 교체하세요.
+  const SUBMIT_ENDPOINT = "https://script.google.com/macros/s/AKfycbwg2jAkSkhmOf7vJGAyZjrUArtPKqSA6Lf0C1MtL5r1BfqFIvANScqJPeFgVbyhZopa0g/exec";
+
+  // ============= STATE =============
+  const TOTAL_STEPS = 7;
+  let currentStep = 1;
+  let category = null; // 'residential' | 'commercial'
+
+  const stepTitles = {
+    1: {label:"STEP 01 · 기본 정보", title:'먼저, 어떻게 <em>불러드릴까요?</em>', sub:"주거든 상업이든, 어떤 공간을 그리고 계신지 함께 알려주세요."},
+    2: {label:"STEP 02 · 예산", title:'편하게, <em>예산을 알려주세요.</em>', sub:"정확한 금액보다 대략적인 범위면 충분해요. 이후 단계에서 함께 조율해갑니다."},
+    3: {label:"STEP 03 · 일정", title:'언제쯤 <em>시작하고 싶으세요?</em>', sub:"공사 시작과 입주·오픈 사이의 여유 시간을 함께 알려주시면 일정 조율이 편해집니다."},
+    4: {label:"STEP 04 · 디자인 취향", title:'어떤 분위기에 <em>마음이 가시나요?</em>', sub:"한 가지에 고정되지 않으셔도 좋아요. 끌리는 무드를 다양하게 선택해 주세요."},
+    5: {label:"STEP 05 · 기능 · 구조", title:'필요한 기능을 <em>골라주세요.</em>', sub:"공간에서 꼭 있었으면 하는 기능과, 구조 변경 가능 여부를 함께 알려주세요."},
+    6: {
+      residential:{label:"STEP 06 · 라이프스타일", title:'이 공간에서, <em>어떤 시간을 보내고 싶으세요?</em>', sub:"가족 구성과 일상을 알려주시면, 그 시간에 가장 어울리는 공간을 그려볼 수 있어요."},
+      commercial:{label:"STEP 06 · 운영 정보", title:'어떤 <em>비즈니스를 만들고 싶으세요?</em>', sub:"운영 형태와 손님의 경험을 알려주시면, 동선과 매출이 함께 흐르는 공간을 설계합니다."},
+      default:{label:"STEP 06 · 라이프스타일 / 운영", title:'이 공간에서, <em>어떤 시간을 만들고 싶으세요?</em>', sub:"공간 유형을 먼저 선택하면 이 단계의 질문이 맞춤형으로 바뀝니다."}
+    },
+    7: {label:"STEP 07 · 마무리", title:'마지막이에요. <em>연락 드릴 방법을</em> 알려주세요.', sub:"전담 디자이너가 24시간 안에 회신드립니다."},
+  };
+
+  // ============= UTIL =============
+  const $  = (s, p=document)=>p.querySelector(s);
+  const $$ = (s, p=document)=>[...p.querySelectorAll(s)];
+  const form = $("#consult-form");
+
+  // ============= CARD/CHIP TOGGLE =============
+  // Delegate clicks for label-wrapped inputs so we can update [data-selected]
+  form.addEventListener("change", (e)=>{
+    const t = e.target;
+    if (t.matches('input[type="radio"], input[type="checkbox"]')) {
+      // Find sibling group via data-group
+      const groupEl = t.closest('[data-group]');
+      if (groupEl) {
+        const type = groupEl.dataset.type;
+        if (type === "single") {
+          $$('label', groupEl).forEach(l=>{
+            l.setAttribute('data-selected', l.contains(l.querySelector('input')) && l.querySelector('input').checked ? 'true' : 'false');
+          });
+        } else if (type === "multi") {
+          const lbl = t.closest('label');
+          if (lbl) lbl.setAttribute('data-selected', t.checked ? 'true' : 'false');
+        }
+        // clear error state on selection
+        groupEl.closest('.field')?.classList.remove('has-error');
+      }
+      // category change → branch
+      if (t.name === "category") {
+        const newCat = t.value;
+        if (newCat !== category) {
+          if (category) clearBranchValues(category); // clear previous branch
+          category = newCat;
+          applyBranching();
+        }
+      }
+      // generic: clear error on the parent field
+      t.closest('.field')?.classList.remove('has-error');
+    }
+  });
+
+  // ============= BRANCHING =============
+  function applyBranching(){
+    // Show/hide conditional blocks
+    $$('.conditional').forEach(c=>{
+      const target = c.dataset.for;
+      c.classList.toggle('show', target === category);
+    });
+    // Update branch labels (e.g. 입주 ↔ 오픈)
+    $$('.branch-label').forEach(el=>{
+      if (category === 'residential') el.textContent = el.dataset.res;
+      else if (category === 'commercial') el.textContent = el.dataset.com;
+    });
+    // Update branched placeholders
+    $$('textarea[data-res-ph]').forEach(t=>{
+      if (category === 'residential') t.placeholder = t.dataset.resPh;
+      else if (category === 'commercial') t.placeholder = t.dataset.comPh;
+    });
+    // Update step 6 title/sub
+    updateStepHeader();
+  }
+
+  function clearBranchValues(prevCat){
+    // Find all conditional blocks for prevCat and clear their inputs
+    $$('.conditional[data-for="'+prevCat+'"]').forEach(c=>{
+      $$('input', c).forEach(inp=>{
+        if (inp.type === 'radio' || inp.type === 'checkbox') {
+          inp.checked = false;
+          const lbl = inp.closest('label');
+          if (lbl) lbl.setAttribute('data-selected','false');
+        } else {
+          inp.value = '';
+        }
+      });
+      $$('textarea', c).forEach(t=>t.value='');
+      $$('.field', c).forEach(f=>f.classList.remove('has-error'));
+    });
+  }
+
+  function isHiddenByBranching(el){
+    const cond = el.closest('.conditional');
+    if (!cond) return false;
+    return !cond.classList.contains('show');
+  }
+
+  // ============= STEP NAV =============
+  function updateStepHeader(){
+    let cfg = stepTitles[currentStep];
+    if (currentStep === 6) cfg = (category && cfg[category]) || cfg.default;
+    $("#step-label").textContent = cfg.label;
+    $("#step-title").innerHTML = cfg.title;
+    $("#step-sub").textContent = cfg.sub;
+    $("#step-counter").textContent = String(currentStep).padStart(2,'0');
+
+    // Stepper
+    $$('#stepper li').forEach(li=>{
+      const n = parseInt(li.dataset.step,10);
+      li.classList.toggle('active', n === currentStep);
+      li.classList.toggle('done', n < currentStep);
+    });
+
+    // Progress bar — set CSS var on the .form-card element (used by ::before pseudo)
+    const pct = (currentStep / TOTAL_STEPS) * 100;
+    document.documentElement.style.setProperty('--progress', pct+'%');
+  }
+
+  function showStep(n){
+    currentStep = Math.max(1, Math.min(TOTAL_STEPS, n));
+    $$('.step').forEach(s=>{
+      s.classList.toggle('active', parseInt(s.dataset.step,10) === currentStep);
+    });
+    updateStepHeader();
+    // Prev disabled?
+    $("#prev-btn").disabled = currentStep === 1;
+    // Next vs submit
+    const nextBtn = $("#next-btn");
+    if (currentStep === TOTAL_STEPS) {
+      nextBtn.innerHTML = '상담 신청 보내기 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      nextBtn.classList.add('btn-submit');
+    } else {
+      nextBtn.innerHTML = '다음 단계 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      nextBtn.classList.remove('btn-submit');
+    }
+    // Smooth scroll into view (top of card)
+    const top = $(".form-card").getBoundingClientRect().top + window.scrollY - 80;
+    window.scrollTo({top, behavior:'smooth'});
+  }
+
+  // ============= VALIDATION =============
+  function validateStep(n){
+    let ok = true;
+    const stepEl = $(`.step[data-step="${n}"]`);
+    if (!stepEl) return true;
+
+    // text/email/tel inputs with required
+    $$('input[required], textarea[required]', stepEl).forEach(inp=>{
+      if (isHiddenByBranching(inp)) return;
+      const field = inp.closest('.field');
+      let valid = true;
+      if (!inp.value || !inp.value.trim()) valid = false;
+      if (inp.type === 'email' && inp.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inp.value)) valid = false;
+      if (inp.type === 'tel' && inp.value) {
+        const digits = inp.value.replace(/\D/g,'');
+        if (digits.length < 8) valid = false;
+      }
+      field?.classList.toggle('has-error', !valid);
+      if (!valid) ok = false;
+    });
+
+    // groups (cards/chips) with data-required="true"
+    $$('[data-group][data-required="true"]', stepEl).forEach(g=>{
+      if (isHiddenByBranching(g)) return;
+      const inputs = $$('input', g);
+      const anyChecked = inputs.some(i=>i.checked);
+      g.closest('.field')?.classList.toggle('has-error', !anyChecked);
+      if (!anyChecked) ok = false;
+    });
+
+    // Step 7 agreement
+    if (n === TOTAL_STEPS) {
+      const agree = $("#agree");
+      const row = $("#agree-row");
+      row.classList.toggle('has-error', !agree.checked);
+      if (!agree.checked) ok = false;
+    }
+
+    return ok;
+  }
+
+  // ============= EVENTS =============
+  $("#prev-btn").addEventListener("click", ()=> showStep(currentStep - 1));
+
+  $("#next-btn").addEventListener("click", async ()=>{
+    if (!validateStep(currentStep)) {
+      // Scroll to first error
+      const firstErr = $(".step.active .has-error");
+      if (firstErr) {
+        const top = firstErr.getBoundingClientRect().top + window.scrollY - 120;
+        window.scrollTo({top, behavior:'smooth'});
+      }
+      return;
+    }
+    if (currentStep < TOTAL_STEPS) {
+      showStep(currentStep + 1);
+    } else {
+      await submitForm();
+    }
+  });
+
+  // Click on stepper item navigates back (only to completed steps)
+  $$('#stepper li').forEach(li=>{
+    li.style.cursor = 'pointer';
+    li.addEventListener('click', ()=>{
+      const n = parseInt(li.dataset.step,10);
+      if (n <= currentStep) showStep(n);
+    });
+  });
+
+  // Phone formatter
+  $("#f-phone").addEventListener('input', (e)=>{
+    let v = e.target.value.replace(/\D/g,'').slice(0,11);
+    if (v.length > 7) v = v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7);
+    else if (v.length > 3) v = v.slice(0,3)+'-'+v.slice(3);
+    e.target.value = v;
+  });
+
+  // ============= FILE UPLOADERS =============
+  const MAX_FILES_PER_FIELD = 12;
+  const MAX_BYTES_PER_FILE  = 30 * 1024 * 1024; // 30MB
+  const uploaderFiles = {};
+
+  function fmtBytes(b){
+    if (b < 1024) return b + ' B';
+    if (b < 1024*1024) return (b/1024).toFixed(0) + ' KB';
+    return (b/(1024*1024)).toFixed(1) + ' MB';
+  }
+  function extOf(name){
+    const m = /\.([a-z0-9]+)$/i.exec(name);
+    return m ? m[1].toLowerCase() : 'FILE';
+  }
+
+  function renderUploaderList(uploaderEl){
+    const key = uploaderEl.dataset.uploader;
+    const list = uploaderEl.querySelector('.uploader-list');
+    const files = uploaderFiles[key] || [];
+    list.innerHTML = '';
+    files.forEach((file, idx)=>{
+      const li = document.createElement('li');
+      const isImage = file.type.startsWith('image/');
+      const thumb = document.createElement('span');
+      thumb.className = 'ftype' + (isImage ? ' img' : '');
+      if (isImage) {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.alt = '';
+        img.onload = ()=> URL.revokeObjectURL(img.src);
+        thumb.appendChild(img);
+      } else {
+        thumb.textContent = extOf(file.name).slice(0,4);
+      }
+      li.appendChild(thumb);
+
+      const name = document.createElement('span');
+      name.className = 'fname';
+      name.textContent = file.name;
+      li.appendChild(name);
+
+      const size = document.createElement('span');
+      size.className = 'fsize';
+      size.textContent = fmtBytes(file.size);
+      li.appendChild(size);
+
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'frm';
+      rm.setAttribute('aria-label', '파일 제거');
+      rm.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+      rm.addEventListener('click', (e)=>{
+        e.preventDefault();
+        uploaderFiles[key].splice(idx, 1);
+        renderUploaderList(uploaderEl);
+      });
+      li.appendChild(rm);
+      list.appendChild(li);
+    });
+  }
+
+  function addFilesToUploader(uploaderEl, fileList){
+    const key = uploaderEl.dataset.uploader;
+    if (!uploaderFiles[key]) uploaderFiles[key] = [];
+    const existing = uploaderFiles[key];
+    const errors = [];
+    [...fileList].forEach(f=>{
+      if (existing.length >= MAX_FILES_PER_FIELD) {
+        errors.push(`최대 ${MAX_FILES_PER_FIELD}개까지 업로드할 수 있어요.`);
+        return;
+      }
+      if (f.size > MAX_BYTES_PER_FILE) {
+        errors.push(`'${f.name}' 은 30MB를 초과해요.`);
+        return;
+      }
+      // de-dup by name+size
+      if (existing.some(x=> x.name===f.name && x.size===f.size)) return;
+      existing.push(f);
+    });
+    renderUploaderList(uploaderEl);
+    if (errors.length) alert(errors.join('\n'));
+  }
+
+  function initUploader(uploaderEl){
+    const input = uploaderEl.querySelector('input[type="file"]');
+    const key   = uploaderEl.dataset.uploader;
+    uploaderFiles[key] = uploaderFiles[key] || [];
+
+    input.addEventListener('change', ()=>{
+      if (input.files && input.files.length) addFilesToUploader(uploaderEl, input.files);
+      input.value = ''; // allow re-selecting the same file
+    });
+
+    // drag-and-drop
+    let depth = 0;
+    uploaderEl.addEventListener('dragenter', (e)=>{
+      e.preventDefault();
+      depth++; uploaderEl.classList.add('is-dragging');
+    });
+    uploaderEl.addEventListener('dragover', (e)=>{ e.preventDefault(); });
+    uploaderEl.addEventListener('dragleave', (e)=>{
+      depth--; if (depth <= 0){ depth = 0; uploaderEl.classList.remove('is-dragging'); }
+    });
+    uploaderEl.addEventListener('drop', (e)=>{
+      e.preventDefault();
+      depth = 0; uploaderEl.classList.remove('is-dragging');
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+        addFilesToUploader(uploaderEl, e.dataTransfer.files);
+      }
+    });
+  }
+
+  $$('.uploader').forEach(initUploader);
+
+  // ============= SUBMIT =============
+  function fileToBase64(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        // Strip "data:mime/type;base64," prefix
+        const r = String(reader.result);
+        const comma = r.indexOf(',');
+        resolve(comma >= 0 ? r.slice(comma + 1) : r);
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function submitForm(){
+    // 1) Plain text fields → FormData → object
+    const fd = new FormData(form);
+    $$('.conditional').forEach(c=>{
+      if (!c.classList.contains('show')) {
+        $$('input,textarea,select', c).forEach(i=>{ if (i.name) fd.delete(i.name); });
+      }
+    });
+    // remove file inputs (empty placeholders) — files are sent separately as base64
+    Object.keys(uploaderFiles).forEach(k => fd.delete(k));
+
+    const data = {};
+    for (const [k,v] of fd.entries()){
+      if (v instanceof File) continue;
+      if (data[k]) {
+        if (Array.isArray(data[k])) data[k].push(v);
+        else data[k] = [data[k], v];
+      } else data[k] = v;
+    }
+    data.category = category || '';
+    data._submitted_at = new Date().toISOString();
+
+    const nextBtn = $("#next-btn");
+    nextBtn.disabled = true;
+    nextBtn.innerHTML = '전송 중…';
+
+    try {
+      // 2) Files → base64 (skip files inside hidden conditional branches)
+      const filesPayload = {};
+      for (const [key, files] of Object.entries(uploaderFiles)) {
+        if (!files || !files.length) continue;
+        const inp = form.querySelector(`input[type="file"][name="${key}"]`);
+        if (inp && inp.closest('.conditional') && !inp.closest('.conditional').classList.contains('show')) continue;
+        filesPayload[key] = [];
+        for (const f of files) {
+          const b64 = await fileToBase64(f);
+          filesPayload[key].push({ name: f.name, type: f.type || 'application/octet-stream', size: f.size, data: b64 });
+        }
+      }
+
+      if (SUBMIT_ENDPOINT && SUBMIT_ENDPOINT.indexOf('script.google.com') !== -1) {
+        // 3) Send as JSON via text/plain to avoid CORS preflight (Apps Script can't handle OPTIONS).
+        const resp = await fetch(SUBMIT_ENDPOINT, {
+          method: 'POST',
+          body: JSON.stringify({ ...data, files: filesPayload }),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          redirect: 'follow'
+        });
+        if (!resp.ok) throw new Error('submit failed: ' + resp.status);
+        try {
+          const j = await resp.json();
+          if (j && j.ok === false) throw new Error(j.error || 'server error');
+        } catch(_) { /* non-JSON 200 is also fine */ }
+      } else {
+        await new Promise(r=>setTimeout(r, 700));
+        const fileSummary = Object.fromEntries(
+          Object.entries(filesPayload).map(([k,arr])=>[k, arr.map(f=>({name:f.name, size:f.size, type:f.type}))])
+        );
+        console.log('[MMGG] Submission payload', {data, files:fileSummary});
+      }
+      showSuccess();
+    } catch(err){
+      console.error('[MMGG] submit error', err);
+      nextBtn.disabled = false;
+      nextBtn.innerHTML = '다시 시도 →';
+      alert('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.\n\n' + (err && err.message ? err.message : ''));
+    }
+  }
+
+  function showSuccess(){
+    $$('.step').forEach(s=>s.classList.remove('active'));
+    $("#form-nav").style.display = 'none';
+    $("#success").classList.add('show');
+    $("#step-label").textContent = "STEP 07 · 완료";
+    $("#step-title").innerHTML = "감사합니다 — <em>좋은 공간을 함께 그릴게요.</em>";
+    $("#step-sub").textContent = "";
+    $("#step-counter").textContent = '07';
+    // 100% progress
+    document.documentElement.style.setProperty('--progress', '100%');
+    $$('#stepper li').forEach(li=> li.classList.add('done'));
+  }
+
+  // ============= PROGRESS BAR (workaround) =============
+  // Move the linear-gradient stop via a style tag we can mutate
+  (function injectProgress(){
+    const style = document.createElement('style');
+    style.id = 'progress-style';
+    style.textContent = `.form-card::before{background:linear-gradient(90deg, var(--accent) var(--progress,14%), var(--line) var(--progress,14%));}`;
+    document.head.appendChild(style);
+  })();
+
+  // ============= INIT =============
+  showStep(1);
+</script>
+
+</body>
+</html>
