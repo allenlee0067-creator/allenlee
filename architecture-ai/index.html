@@ -1,0 +1,1491 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Arch AI Drawing Kit</title>
+<meta name="description" content="건축 다이어그램·평면·입면·단면·디테일 도면을 파라메트릭으로 생성하고, AI 렌더용 프롬프트를 자동으로 만드는 도구" />
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+<style>
+  :root{
+    --bg:#efe9dc; --bg-2:#e3dcc9; --paper:#f7f2e6; --white:#fffdf8;
+    --ink:#0e0d0b; --ink-2:#2a2722; --ink-3:#6e6862; --ink-4:#a8a094;
+    --line:#d4cdba; --line-2:#beb5a0;
+    --accent:#c14a2b; --accent-d:#8f3219; --accent-wash:#f1d9cd;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --sans:"Pretendard Variable","Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--ink);background:var(--bg);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer}
+
+  header{border-bottom:1px solid var(--line-2);background:var(--paper)}
+  .hd{max-width:1480px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .mark{width:30px;height:30px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font:600 12px var(--mono)}
+  .hd h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.01em}
+  .hd p{margin:0;color:var(--ink-3);font-size:12.5px}
+  .hd .sp{flex:1}
+
+  nav.tabs{max-width:1480px;margin:0 auto;padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+  nav.tabs button{border:0;background:none;padding:12px 16px 11px;border-bottom:2px solid transparent;white-space:nowrap;color:var(--ink-3);font-weight:600}
+  nav.tabs button span{font:500 11px var(--mono);margin-right:6px;color:var(--ink-4)}
+  nav.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+  nav.tabs button[aria-selected=true] span{color:var(--accent)}
+
+  main{max-width:1480px;margin:0 auto;padding:20px 24px 60px;display:grid;grid-template-columns:350px minmax(0,1fr);gap:20px;align-items:start}
+  aside{display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:3px}
+  .card>h2,.card>summary{margin:0;padding:11px 14px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+  details.card>summary{cursor:pointer;list-style:none}
+  details.card>summary::-webkit-details-marker{display:none}
+  details.card>summary::after{content:"+";margin-left:auto;font-family:var(--mono);color:var(--ink-3)}
+  details.card[open]>summary::after{content:"−"}
+  details.card:not([open])>summary{border-bottom:0}
+  .body{padding:12px 14px;display:grid;gap:10px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  label.f{display:grid;gap:4px;font-size:12px;color:var(--ink-3);font-weight:500}
+  label.f>b{font-weight:600;color:var(--ink-2)}
+  input[type=text],input[type=number],select,textarea{width:100%;background:var(--white);border:1px solid var(--line-2);border-radius:2px;padding:7px 8px;font-size:13px}
+  textarea{font-family:var(--mono);font-size:12px;line-height:1.55;resize:vertical;min-height:96px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent-wash);border-color:var(--accent)}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .rng{display:grid;grid-template-columns:1fr 48px;gap:8px;align-items:center}
+  .rng output{font:500 12px var(--mono);text-align:right;color:var(--ink-2)}
+  .chk{display:flex;flex-wrap:wrap;gap:6px}
+  .chk label{display:flex;align-items:center;gap:5px;font-size:12.5px;background:var(--white);border:1px solid var(--line-2);padding:5px 8px;border-radius:2px;cursor:pointer}
+  .chk input{accent-color:var(--accent);margin:0}
+  .hint{font-size:11.5px;color:var(--ink-3);margin:0}
+  .seg{display:flex;border:1px solid var(--line-2);border-radius:2px;overflow:hidden}
+  .seg button{flex:1;border:0;background:var(--white);padding:7px 6px;font-size:12.5px;border-right:1px solid var(--line-2)}
+  .seg button:last-child{border-right:0}
+  .seg button.on{background:var(--ink);color:var(--paper)}
+
+  .stage-wrap{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .bar h2{margin:0;font-size:13px;font-weight:700}
+  .bar .meta{font:500 11.5px var(--mono);color:var(--ink-3)}
+  .bar .sp{flex:1}
+  .btn{border:1px solid var(--ink);background:var(--white);padding:6px 11px;font-size:12.5px;font-weight:600;border-radius:2px}
+  .btn:hover{background:var(--bg-2)}
+  .btn.pri{background:var(--ink);color:var(--paper)}
+  .btn.pri:hover{background:var(--ink-2)}
+  #stage{background:#fff;padding:0;line-height:0}
+  #stage svg{width:100%;height:auto;display:block}
+
+  .anat{display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px 0}
+  .anat span{font-size:11.5px;background:var(--white);border:1px solid var(--line);padding:3px 8px;border-radius:2px;color:var(--ink-2)}
+  .anat span b{color:var(--accent);font-weight:600;margin-right:4px}
+  .pbox{padding:12px 14px;display:grid;gap:10px}
+  .pbox .lbl{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--ink-2)}
+  .pbox .lbl .sp{flex:1}
+  .pbox pre{margin:0;white-space:pre-wrap;word-break:break-word;background:var(--white);border:1px solid var(--line-2);padding:10px 12px;font:12.5px/1.6 var(--mono);border-radius:2px;color:var(--ink)}
+  .pbox pre.neg{color:var(--ink-3)}
+  .ko{font-size:13px;color:var(--ink-2);background:var(--accent-wash);padding:10px 12px;border-radius:2px;margin:0}
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px}
+  .flow div{background:var(--white);border:1px solid var(--line);padding:9px 10px;font-size:12px;color:var(--ink-2)}
+  .flow div b{display:block;font:600 11px var(--mono);color:var(--accent);margin-bottom:2px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;font-size:13px;border-radius:2px;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.on{opacity:1}
+  [hidden]{display:none!important}
+
+  @media (max-width:980px){
+    main{grid-template-columns:1fr;padding:16px}
+    .hd,nav.tabs{padding-left:16px;padding-right:16px}
+    .flow{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <div class="mark">AI</div>
+    <div>
+      <h1>Arch AI Drawing Kit</h1>
+      <p>도면 생성 → PNG 저장 → AI 렌더 참조 이미지 + 자동 프롬프트</p>
+    </div>
+    <div class="sp"></div>
+  </div>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+</header>
+
+<main>
+  <aside>
+    <details class="card" open>
+      <summary>프로젝트 · 프롬프트 설정</summary>
+      <div class="body">
+        <label class="f"><b>프로젝트명</b><input type="text" id="g-project" value="MMGG HOUSE" /></label>
+        <div class="row">
+          <label class="f"><b>용도</b>
+            <select id="g-use">
+              <option value="house">단독주택</option>
+              <option value="apt">공동주택</option>
+              <option value="office">오피스</option>
+              <option value="cafe">카페·리테일</option>
+              <option value="gallery">갤러리·문화시설</option>
+              <option value="school">학교</option>
+              <option value="hotel">호텔</option>
+            </select>
+          </label>
+          <label class="f"><b>대지 맥락</b>
+            <select id="g-context">
+              <option value="urban">도심</option>
+              <option value="suburb">교외 주거지</option>
+              <option value="coast">해안</option>
+              <option value="forest">산지·숲</option>
+              <option value="campus">캠퍼스</option>
+            </select>
+          </label>
+        </div>
+        <label class="f"><b>주 재료</b>
+          <select id="g-mat">
+            <option value="conc">노출콘크리트</option>
+            <option value="brick">붉은 벽돌</option>
+            <option value="wood">목재 루버·사이딩</option>
+            <option value="metal">금속 패널</option>
+            <option value="stone">석재</option>
+            <option value="stucco">백색 스터코</option>
+          </select>
+        </label>
+        <label class="f"><b>렌더 스타일</b><select id="g-style"></select></label>
+        <div class="row">
+          <label class="f"><b>AI 엔진</b>
+            <select id="g-engine">
+              <option value="nl">ChatGPT · Gemini (자연어)</option>
+              <option value="mj">Midjourney</option>
+              <option value="sd">Stable Diffusion · ComfyUI</option>
+            </select>
+          </label>
+          <label class="f"><b>화면비</b>
+            <select id="g-ar">
+              <option>10:7</option><option>16:9</option><option>4:3</option><option>1:1</option><option>3:4</option>
+            </select>
+          </label>
+        </div>
+        <div class="chk"><label><input type="checkbox" id="g-ref" checked /> 생성 도면을 참조 이미지로 첨부</label></div>
+      </div>
+    </details>
+
+    <!-- ===== 01 DIAGRAM ===== -->
+    <section class="card ctrl" data-tab="diagram">
+      <h2>다이어그램 설정</h2>
+      <div class="body">
+        <div class="seg" id="dg-type">
+          <button data-v="mass" class="on">매스 진화</button>
+          <button data-v="bubble">프로그램</button>
+          <button data-v="env">환경 분석</button>
+        </div>
+        <div data-dg="mass" class="body" style="padding:0">
+          <div class="row">
+            <label class="f"><b>폭 W (m)</b><input type="number" id="m-w" value="30" min="6" max="120" /></label>
+            <label class="f"><b>깊이 D (m)</b><input type="number" id="m-d" value="22" min="6" max="120" /></label>
+          </div>
+          <div class="row">
+            <label class="f"><b>층수</b><input type="number" id="m-n" value="5" min="1" max="30" /></label>
+            <label class="f"><b>층고 (m)</b><input type="number" id="m-fh" value="3.6" step="0.1" min="2.4" max="8" /></label>
+          </div>
+          <label class="f"><b>조작 순서 (체크한 것만 단계로)</b></label>
+          <div class="chk" id="m-ops">
+            <label><input type="checkbox" value="split" checked /> 매스 분절</label>
+            <label><input type="checkbox" value="court" /> 중정 비우기</label>
+            <label><input type="checkbox" value="shift" checked /> 상부 이동</label>
+            <label><input type="checkbox" value="elevate" checked /> 필로티</label>
+            <label><input type="checkbox" value="terrace" checked /> 계단식 테라스</label>
+          </div>
+        </div>
+        <div data-dg="bubble" class="body" style="padding:0" hidden>
+          <label class="f"><b>프로그램 (이름, 면적㎡, 그룹)</b>
+            <textarea id="b-prog" rows="8">로비, 120, 공용
+카페, 80, 공용
+전시실, 260, 문화
+수장고, 90, 지원
+교육실, 110, 문화
+사무실, 70, 지원
+라운지, 60, 공용
+옥외마당, 150, 외부</textarea></label>
+          <label class="f"><b>인접 관계 (A-B, 한 줄에 하나)</b>
+            <textarea id="b-adj" rows="5">로비-카페
+로비-전시실
+로비-라운지
+전시실-수장고
+전시실-교육실
+카페-옥외마당
+사무실-수장고</textarea></label>
+        </div>
+        <div data-dg="env" class="body" style="padding:0" hidden>
+          <div class="row">
+            <label class="f"><b>위도 (°N)</b><input type="number" id="e-lat" value="37.5" step="0.1" min="0" max="66" /></label>
+            <label class="f"><b>건물 높이 (m)</b><input type="number" id="e-h" value="12" min="3" max="200" /></label>
+          </div>
+          <div class="row">
+            <label class="f"><b>폭 (m)</b><input type="number" id="e-w" value="24" /></label>
+            <label class="f"><b>깊이 (m)</b><input type="number" id="e-d" value="14" /></label>
+          </div>
+          <label class="f"><b>건물 방위 회전</b><div class="rng"><input type="range" id="e-rot" min="-45" max="45" value="-15" /><output>-15°</output></div></label>
+          <div class="row">
+            <label class="f"><b>여름 주풍향</b><select id="e-ws"></select></label>
+            <label class="f"><b>겨울 주풍향</b><select id="e-ww"></select></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 02 PLAN ===== -->
+    <section class="card ctrl" data-tab="plan" hidden>
+      <h2>평면도 설정</h2>
+      <div class="body">
+        <div class="row">
+          <label class="f"><b>외곽 폭 (m)</b><input type="number" id="p-w" value="14" min="4" max="80" step="0.1" /></label>
+          <label class="f"><b>외곽 깊이 (m)</b><input type="number" id="p-d" value="10" min="4" max="80" step="0.1" /></label>
+        </div>
+        <label class="f"><b>실 목록 (이름 면적㎡) — 순서가 배치 순서</b>
+          <textarea id="p-rooms" rows="9">현관 6
+거실 32
+주방 16
+식당 14
+욕실 6
+침실1 18
+침실2 13
+드레스룸 7
+서재 12</textarea></label>
+        <p class="hint">면적은 외곽 크기에 맞게 비율로 재배분됩니다. 줄 순서를 바꾸면 배치가 바뀝니다.</p>
+        <div class="row">
+          <label class="f"><b>외벽 (mm)</b><input type="number" id="p-to" value="300" step="10" /></label>
+          <label class="f"><b>내벽 (mm)</b><input type="number" id="p-ti" value="150" step="10" /></label>
+        </div>
+        <div class="chk">
+          <label><input type="checkbox" id="p-furn" checked /> 가구</label>
+          <label><input type="checkbox" id="p-dim" checked /> 치수</label>
+          <label><input type="checkbox" id="p-north" checked /> 방위·스케일</label>
+        </div>
+        <button class="btn" id="p-shuffle" type="button">배치 순서 섞기</button>
+      </div>
+    </section>
+
+    <!-- ===== 03 ELEVATION ===== -->
+    <section class="card ctrl" data-tab="elev" hidden>
+      <h2>입면도 설정</h2>
+      <div class="body">
+        <div class="row">
+          <label class="f"><b>입면 폭 (m)</b><input type="number" id="v-w" value="18" min="4" max="100" /></label>
+          <label class="f"><b>층수</b><input type="number" id="v-n" value="4" min="1" max="30" /></label>
+        </div>
+        <div class="row">
+          <label class="f"><b>1층 층고</b><input type="number" id="v-gfh" value="4.5" step="0.1" /></label>
+          <label class="f"><b>기준층 층고</b><input type="number" id="v-fh" value="3.3" step="0.1" /></label>
+        </div>
+        <div class="row">
+          <label class="f"><b>베이 수</b><input type="number" id="v-bays" value="5" min="1" max="20" /></label>
+          <label class="f"><b>출입구 베이</b><input type="number" id="v-ent" value="3" min="1" max="20" /></label>
+        </div>
+        <label class="f"><b>창 유형</b>
+          <select id="v-win">
+            <option value="punched">펀치 창 (개별 창)</option>
+            <option value="ribbon">수평 연속창</option>
+            <option value="curtain">커튼월</option>
+            <option value="vertical">수직 슬릿 창</option>
+          </select>
+        </label>
+        <label class="f"><b>개구율</b><div class="rng"><input type="range" id="v-ratio" min="20" max="90" value="55" /><output>55%</output></div></label>
+        <label class="f"><b>지붕</b>
+          <select id="v-roof">
+            <option value="flat">평지붕 + 파라펫</option>
+            <option value="gable">박공지붕</option>
+            <option value="shed">외쪽지붕</option>
+          </select>
+        </label>
+        <div class="chk">
+          <label><input type="checkbox" id="v-gf" checked /> 1층 전면 유리</label>
+          <label><input type="checkbox" id="v-ppl" checked /> 사람</label>
+          <label><input type="checkbox" id="v-tree" checked /> 수목</label>
+          <label><input type="checkbox" id="v-lvl" checked /> 레벨·치수</label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 04 SECTION ===== -->
+    <section class="card ctrl" data-tab="section" hidden>
+      <h2>단면 · 단면투시 설정</h2>
+      <div class="body">
+        <div class="seg" id="s-mode">
+          <button data-v="section" class="on">단면도</button>
+          <button data-v="persp">단면투시도</button>
+        </div>
+        <div class="row">
+          <label class="f"><b>단면 폭 (m)</b><input type="number" id="s-w" value="16" min="4" max="100" /></label>
+          <label class="f"><b>지상 층수</b><input type="number" id="s-n" value="3" min="1" max="20" /></label>
+        </div>
+        <div class="row">
+          <label class="f"><b>1층 층고</b><input type="number" id="s-gfh" value="4.2" step="0.1" /></label>
+          <label class="f"><b>기준층 층고</b><input type="number" id="s-fh" value="3.4" step="0.1" /></label>
+        </div>
+        <div class="row">
+          <label class="f"><b>지하 층수</b><input type="number" id="s-b" value="1" min="0" max="5" /></label>
+          <label class="f"><b>슬래브 (mm)</b><input type="number" id="s-slab" value="250" step="10" /></label>
+        </div>
+        <label class="f"><b>지붕</b>
+          <select id="s-roof"><option value="flat">평지붕</option><option value="gable">박공지붕</option></select>
+        </label>
+        <label class="f"><b>실 이름 (아래층부터, 한 줄에 한 층)</b>
+          <textarea id="s-rooms" rows="5">주차·기계실
+로비·카페
+작업실
+거실·라운지</textarea></label>
+        <div class="chk">
+          <label><input type="checkbox" id="s-void" checked /> 2개층 보이드</label>
+          <label><input type="checkbox" id="s-stair" checked /> 계단</label>
+          <label><input type="checkbox" id="s-ppl" checked /> 사람</label>
+        </div>
+        <div data-sp="persp" hidden class="body" style="padding:0">
+          <label class="f"><b>투시 깊이 (m)</b><div class="rng"><input type="range" id="s-depth" min="4" max="40" value="14" /><output>14</output></div></label>
+          <label class="f"><b>소실점 좌우 위치</b><div class="rng"><input type="range" id="s-vpx" min="15" max="85" value="58" /><output>58%</output></div></label>
+          <label class="f"><b>눈높이 층</b><select id="s-eye"></select></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 05 DETAIL ===== -->
+    <section class="card ctrl" data-tab="detail" hidden>
+      <h2>디테일 설정</h2>
+      <div class="body">
+        <div class="seg" id="d-mode">
+          <button data-v="draw" class="on">디테일 도면</button>
+          <button data-v="explode">분해 다이어그램</button>
+        </div>
+        <label class="f"><b>부위 프리셋</b><select id="d-preset"></select></label>
+        <label class="f"><b>레이어 (재료 | 두께mm | 해치 | 열전도율 λ) — 외부 → 실내</b>
+          <textarea id="d-layers" rows="8"></textarea></label>
+        <p class="hint">해치: conc, insul, brick, wood, gyp, mortar, stone, steel, membrane, air, gravel, glass, earth</p>
+        <div class="row">
+          <label class="f"><b>외기 온도 ℃</b><input type="number" id="d-to" value="-11" /></label>
+          <label class="f"><b>실내 온도 ℃</b><input type="number" id="d-ti" value="20" /></label>
+        </div>
+        <div class="chk">
+          <label><input type="checkbox" id="d-temp" checked /> 온도 구배선</label>
+          <label><input type="checkbox" id="d-dim" checked /> 치수</label>
+        </div>
+      </div>
+    </section>
+  </aside>
+
+  <div class="stage-wrap">
+    <section class="card">
+      <div class="bar">
+        <h2 id="st-title">—</h2><span class="meta" id="st-meta"></span>
+        <div class="sp"></div>
+        <button class="btn" id="dl-svg" type="button">SVG 저장</button>
+        <button class="btn pri" id="dl-png" type="button">PNG 저장 (참조용)</button>
+      </div>
+      <div id="stage"></div>
+    </section>
+
+    <section class="card">
+      <div class="bar"><h2>AI 렌더 프롬프트</h2><span class="meta" id="pr-meta"></span></div>
+      <div class="anat" id="anat"></div>
+      <div class="pbox">
+        <p class="ko" id="pr-ko"></p>
+        <div class="lbl">프롬프트<span class="sp"></span><button class="btn pri" data-copy="pr-main" type="button">복사</button></div>
+        <pre id="pr-main"></pre>
+        <div id="neg-wrap">
+          <div class="lbl">네거티브 프롬프트<span class="sp"></span><button class="btn" data-copy="pr-neg" type="button">복사</button></div>
+          <pre id="pr-neg" class="neg"></pre>
+        </div>
+        <div id="ex-wrap"><div class="lbl">권장 설정</div><pre id="pr-extra" class="neg"></pre></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="bar"><h2>사용 순서</h2></div>
+      <div class="flow">
+        <div><b>01</b>왼쪽에서 치수·실·재료를 입력해 도면 형태를 확정</div>
+        <div><b>02</b>PNG 저장 — 형태를 고정하는 참조 이미지</div>
+        <div><b>03</b>AI 엔진에 PNG 첨부 + 프롬프트 붙여넣기</div>
+        <div><b>04</b>스타일만 바꿔 여러 장 생성 → 형태는 그대로 유지</div>
+      </div>
+    </section>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   Arch AI Drawing Kit
+   - Parametric SVG drawings (diagram / plan / elevation / section / detail)
+   - Prompt kit: drawing anatomy -> engine-specific prompt
+   ========================================================= */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const INK = '#141310', GRAY = '#8a857c', LIGHT = '#c9c3b6', ACC = '#c14a2b', PAPER = '#fffdf8';
+const FONT = "Pretendard Variable, Pretendard, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif";
+const MONO = "'IBM Plex Mono', Menlo, monospace";
+const VW = 1000, VH = 700;
+
+/* ---------- tiny svg string helpers ---------- */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const at = o => Object.entries(o || {}).filter(([, v]) => v !== undefined && v !== null && v !== false)
+  .map(([k, v]) => `${k.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}="${esc(v)}"`).join(' ');
+const f2 = n => Math.round(n * 100) / 100;
+const rect = (x, y, w, h, o) => { if (w < 0) { x += w; w = -w; } if (h < 0) { y += h; h = -h; } return `<rect x="${f2(x)}" y="${f2(y)}" width="${f2(w)}" height="${f2(h)}" ${at(o)}/>`; };
+const line = (x1, y1, x2, y2, o) => `<line x1="${f2(x1)}" y1="${f2(y1)}" x2="${f2(x2)}" y2="${f2(y2)}" ${at(o)}/>`;
+const path = (d, o) => `<path d="${d}" ${at(o)}/>`;
+const poly = (pts, o) => `<polygon points="${pts.map(p => f2(p[0]) + ',' + f2(p[1])).join(' ')}" ${at(o)}/>`;
+const pline = (pts, o) => `<polyline points="${pts.map(p => f2(p[0]) + ',' + f2(p[1])).join(' ')}" ${at(o)}/>`;
+const circ = (x, y, r, o) => `<circle cx="${f2(x)}" cy="${f2(y)}" r="${f2(r)}" ${at(o)}/>`;
+const text = (x, y, s, o = {}) => `<text x="${f2(x)}" y="${f2(y)}" ${at({ fontFamily: FONT, fontSize: 12, fill: INK, ...o })}>${esc(s)}</text>`;
+const mm = m => Math.round(m * 1000).toLocaleString('en-US');
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const scaleTxt = s => { const r = 1000 / (s * .42); const std = [20, 30, 50, 75, 100, 150, 200, 250, 300, 500, 750, 1000]; return '1:' + (std.find(v => v >= r * .9) || Math.round(r)) + ' @A3'; };
+
+/* ---------- hatch patterns ---------- */
+const DEFS = `<defs>
+<pattern id="h-conc" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#fff"/><circle cx="3" cy="4" r=".9" fill="#555"/><circle cx="10" cy="10" r=".7" fill="#555"/><circle cx="11" cy="3" r=".5" fill="#555"/><circle cx="5" cy="12" r=".5" fill="#555"/><path d="M6 9 l2 -3 l1.6 3z" fill="none" stroke="#555" stroke-width=".6"/></pattern>
+<pattern id="h-insul" width="12" height="16" patternUnits="userSpaceOnUse"><rect width="12" height="16" fill="#fff"/><path d="M6 0 Q0 4 6 8 T6 16" fill="none" stroke="#555" stroke-width=".7"/></pattern>
+<pattern id="h-brick" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#555" stroke-width=".9"/></pattern>
+<pattern id="h-steel" width="2.6" height="2.6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="3" fill="#fff"/><line x1="0" y1="0" x2="0" y2="3" stroke="#333" stroke-width=".7"/></pattern>
+<pattern id="h-earth" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#8a857c" stroke-width=".8"/><line x1="6" y1="5" x2="6" y2="12" stroke="#8a857c" stroke-width=".5"/></pattern>
+<pattern id="h-wood" width="22" height="7" patternUnits="userSpaceOnUse"><rect width="22" height="7" fill="#fff"/><path d="M0 3.5 C6 1 12 6 22 3.5" fill="none" stroke="#666" stroke-width=".6"/></pattern>
+<pattern id="h-gyp" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="#fff"/><circle cx="1.5" cy="1.5" r=".45" fill="#666"/><circle cx="4" cy="3.8" r=".35" fill="#666"/></pattern>
+<pattern id="h-mortar" width="9" height="9" patternUnits="userSpaceOnUse"><rect width="9" height="9" fill="#fff"/><circle cx="2" cy="2" r=".6" fill="#555"/><circle cx="6.5" cy="6" r=".5" fill="#555"/><circle cx="7" cy="1.5" r=".3" fill="#555"/></pattern>
+<pattern id="h-gravel" width="12" height="10" patternUnits="userSpaceOnUse"><rect width="12" height="10" fill="#fff"/><circle cx="3" cy="3" r="2.2" fill="none" stroke="#555" stroke-width=".6"/><circle cx="9" cy="7.5" r="2" fill="none" stroke="#555" stroke-width=".6"/></pattern>
+<pattern id="h-stone" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#fff"/><line x1="0" y1="0" x2="0" y2="8" stroke="#555" stroke-width=".6"/><line x1="0" y1="0" x2="8" y2="0" stroke="#555" stroke-width=".6"/></pattern>
+<pattern id="h-glass" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#e6eeef"/></pattern>
+<pattern id="h-air" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#fff"/></pattern>
+<pattern id="h-membrane" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="#141310"/></pattern>
+<pattern id="e-conc" width="44" height="22" patternUnits="userSpaceOnUse"><rect width="44" height="22" fill="#f4f2ee"/><path d="M0 0H44M0 0V22" stroke="#c9c3b6" stroke-width=".6"/><circle cx="7" cy="5" r=".8" fill="#b3ad a2"/><circle cx="37" cy="5" r=".8" fill="#b3ada2"/><circle cx="7" cy="17" r=".8" fill="#b3ada2"/><circle cx="37" cy="17" r=".8" fill="#b3ada2"/></pattern>
+<pattern id="e-brick" width="16" height="8" patternUnits="userSpaceOnUse"><rect width="16" height="8" fill="#f1e2d9"/><path d="M0 0H16M0 4H16M0 0V4M8 4V8" stroke="#c49a86" stroke-width=".55"/></pattern>
+<pattern id="e-wood" width="7" height="10" patternUnits="userSpaceOnUse"><rect width="7" height="10" fill="#f3e9da"/><path d="M0 0V10" stroke="#c7ae8b" stroke-width=".6"/></pattern>
+<pattern id="e-metal" width="30" height="60" patternUnits="userSpaceOnUse"><rect width="30" height="60" fill="#eceeee"/><path d="M0 0V60M0 0H30" stroke="#a9b0b2" stroke-width=".7"/></pattern>
+<pattern id="e-stone" width="36" height="18" patternUnits="userSpaceOnUse"><rect width="36" height="18" fill="#efece6"/><path d="M0 0H36M0 9H36M0 0V9M18 9V18" stroke="#bdb6aa" stroke-width=".55"/></pattern>
+<pattern id="e-stucco" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#fbfaf7"/><circle cx="2" cy="3" r=".3" fill="#d6d0c4"/><circle cx="6" cy="6" r=".3" fill="#d6d0c4"/></pattern>
+<marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${ACC}"/></marker>
+<marker id="arrk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${INK}"/></marker>
+</defs>`.replace('#b3ad a2', '#b3ada2');
+
+/* ---------- global settings ---------- */
+const STYLES = {
+  line: { ko: '흑백 라인 드로잉', en: 'clean black ink line drawing on white paper, precise vector linework, hierarchy of line weights, no color' },
+  accent: { ko: '모노톤 + 포인트 컬러', en: 'monochrome architectural drawing with one terracotta accent color, flat gray tones, crisp edges' },
+  watercolor: { ko: '수채화 렌더', en: 'soft architectural watercolor rendering over a fine pencil underdrawing, light transparent washes, paper texture' },
+  blueprint: { ko: '블루프린트', en: 'blueprint style, thin white lines on deep prussian blue, technical drafting annotations' },
+  collage: { ko: '건축 콜라주', en: 'architectural collage, flat color blocks, cut-out paper and material textures, cut-out entourage people' },
+  sketch: { ko: '핸드 스케치', en: 'loose architect hand sketch, black felt-tip pen, confident overlapping strokes, gray marker tones' },
+  axo: { ko: '파스텔 액소노메트릭', en: 'clean isometric illustration, muted pastel flat colors, crisp outlines, soft ambient occlusion, no perspective distortion' },
+  photo: { ko: '포토리얼 렌더', en: 'photorealistic architectural visualization, physically based materials, soft daylight, global illumination, high-end archviz quality' },
+};
+const USE_EN = { house: 'single-family house', apt: 'multi-family housing', office: 'office building', cafe: 'cafe and retail building', gallery: 'gallery and cultural center', school: 'school building', hotel: 'boutique hotel' };
+const USE_KO = { house: '단독주택', apt: '공동주택', office: '오피스', cafe: '카페·리테일', gallery: '갤러리·문화시설', school: '학교', hotel: '호텔' };
+const CTX_EN = { urban: 'in a dense urban block', suburb: 'in a quiet suburban neighborhood', coast: 'on a coastal site', forest: 'in a forested hillside', campus: 'on a university campus' };
+const MAT_EN = { conc: 'exposed fair-faced concrete', brick: 'red clay brick', wood: 'timber louvers and siding', metal: 'standing-seam metal panels', stone: 'natural stone cladding', stucco: 'white stucco' };
+const MAT_KO = { conc: '노출콘크리트', brick: '붉은 벽돌', wood: '목재', metal: '금속 패널', stone: '석재', stucco: '백색 스터코' };
+const BASE_NEG = ['blurry', 'warped or wobbly lines', 'gibberish text', 'watermark', 'logo', 'extra floors', 'distorted proportions', 'low resolution'];
+
+const G = {};
+function readGlobal() {
+  G.project = $('#g-project').value.trim() || 'UNTITLED';
+  G.use = $('#g-use').value; G.context = $('#g-context').value; G.mat = $('#g-mat').value;
+  G.style = $('#g-style').value; G.engine = $('#g-engine').value; G.ar = $('#g-ar').value; G.ref = $('#g-ref').checked;
+}
+const num = id => { const v = parseFloat($('#' + id).value); return isFinite(v) ? v : 0; };
+const chk = id => $('#' + id).checked;
+const segVal = id => $(`#${id} .on`).dataset.v;
+
+/* ---------- drawing frame + title block ---------- */
+function frame(title, scale, code) {
+  const d = new Date(); const ds = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  const cells = [['PROJECT', G.project, 16], ['DRAWING', title, 300], ['SCALE', scale, 620], ['DATE', ds, 760], ['NO.', code, 880]];
+  let s = rect(16, 16, 968, 668, { fill: 'none', stroke: INK, strokeWidth: 1.2 }) + line(16, 640, 984, 640, { stroke: INK, strokeWidth: .8 });
+  cells.forEach(([k, v, x], i) => {
+    if (i) s += line(x, 640, x, 684, { stroke: INK, strokeWidth: .6 });
+    s += text(x + 10, 655, k, { fontSize: 8.5, fill: GRAY, fontFamily: MONO, letterSpacing: '.08em' });
+    s += text(x + 10, 674, v, { fontSize: 12.5, fontWeight: 700 });
+  });
+  return s;
+}
+const svgWrap = inner => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VW} ${VH}" width="${VW}" height="${VH}">${DEFS}<rect width="${VW}" height="${VH}" fill="${PAPER}"/>${inner}</svg>`;
+
+function northArrow(x, y, rot = 0) {
+  return `<g transform="translate(${x},${y}) rotate(${rot})">${circ(0, 0, 16, { fill: 'none', stroke: INK, strokeWidth: .8 })}${poly([[0, -16], [6, 8], [0, 3], [-6, 8]], { fill: INK })}</g>` + text(x, y - 22, 'N', { fontSize: 11, fontWeight: 700, textAnchor: 'middle', fontFamily: MONO });
+}
+function scaleBar(x, y, s) { // s = px per m
+  const steps = [0, 1, 2, 5, 10].filter(v => v * s < 260);
+  let o = '';
+  for (let i = 0; i < steps.length - 1; i++) o += rect(x + steps[i] * s, y, (steps[i + 1] - steps[i]) * s, 5, { fill: i % 2 ? PAPER : INK, stroke: INK, strokeWidth: .6 });
+  steps.forEach(v => o += text(x + v * s, y + 17, v, { fontSize: 9, fontFamily: MONO, textAnchor: 'middle' }));
+  return o + text(x + steps[steps.length - 1] * s + 8, y + 6, 'm', { fontSize: 9, fontFamily: MONO });
+}
+function person(cx, gy, hpx, o = {}) {
+  const u = hpx / 10, col = o.fill || '#5f5a52';
+  return `<g opacity="${o.op || 1}">` + circ(cx, gy - 9.25 * u, .72 * u, { fill: col }) +
+    path(`M${cx - 1.15 * u} ${gy - 8.3 * u} L${cx + 1.15 * u} ${gy - 8.3 * u} L${cx + 1.45 * u} ${gy - 4.6 * u} L${cx + .9 * u} ${gy - 4.6 * u} L${cx + .8 * u} ${gy} L${cx + .15 * u} ${gy} L${cx} ${gy - 4.1 * u} L${cx - .15 * u} ${gy} L${cx - .8 * u} ${gy} L${cx - .9 * u} ${gy - 4.6 * u} L${cx - 1.45 * u} ${gy - 4.6 * u} Z`, { fill: col }) + '</g>';
+}
+function tree(cx, gy, hpx) {
+  const r = hpx * .3;
+  return line(cx, gy, cx, gy - hpx * .55, { stroke: GRAY, strokeWidth: 1.4 }) +
+    circ(cx, gy - hpx * .68, r, { fill: '#fff', fillOpacity: .55, stroke: GRAY, strokeWidth: .9 }) +
+    circ(cx - r * .55, gy - hpx * .55, r * .62, { fill: '#fff', fillOpacity: .55, stroke: GRAY, strokeWidth: .8 }) +
+    circ(cx + r * .6, gy - hpx * .58, r * .58, { fill: '#fff', fillOpacity: .55, stroke: GRAY, strokeWidth: .8 });
+}
+// horizontal / vertical dimension
+function dimH(x1, x2, y, label, ext) {
+  let o = line(x1 - 6, y, x2 + 6, y, { stroke: INK, strokeWidth: .6 });
+  [x1, x2].forEach(x => { o += line(x - 4, y + 4, x + 4, y - 4, { stroke: INK, strokeWidth: 1.1 }); if (ext !== undefined) o += line(x, ext, x, y + 5 * Math.sign(y - ext || 1) * -1 + (y - ext > 0 ? 5 : -5), { stroke: INK, strokeWidth: .4 }); });
+  if (Math.abs(x2 - x1) > 18) o += text((x1 + x2) / 2, y - 4, label, { fontSize: 9.5, fontFamily: MONO, textAnchor: 'middle' });
+  return o;
+}
+function dimV(y1, y2, x, label) {
+  let o = line(x, y1 - 6, x, y2 + 6, { stroke: INK, strokeWidth: .6 });
+  [y1, y2].forEach(y => o += line(x - 4, y + 4, x + 4, y - 4, { stroke: INK, strokeWidth: 1.1 }));
+  if (Math.abs(y2 - y1) > 18) o += `<text x="${f2(x - 5)}" y="${f2((y1 + y2) / 2)}" transform="rotate(-90 ${f2(x - 5)} ${f2((y1 + y2) / 2)})" text-anchor="middle" font-size="9.5" font-family="${esc(MONO)}" fill="${INK}">${esc(label)}</text>`;
+  return o;
+}
+function levelMark(x, y, lab, el) {
+  return poly([[x, y], [x - 5, y - 8], [x + 5, y - 8]], { fill: 'none', stroke: INK, strokeWidth: .8 }) +
+    line(x - 14, y, x + 60, y, { stroke: INK, strokeWidth: .5 }) +
+    text(x + 9, y - 3, lab, { fontSize: 9.5, fontWeight: 700 }) + text(x + 9, y + 10, el, { fontSize: 9, fontFamily: MONO, fill: GRAY });
+}
+
+/* =========================================================
+   01  DIAGRAM
+   ========================================================= */
+const B = (x, y, z, w, d, h, t) => ({ x, y, z, w, d, h, t });
+function subtract(a, c) {
+  const ix1 = Math.max(a.x, c.x), ix2 = Math.min(a.x + a.w, c.x + c.w);
+  const iy1 = Math.max(a.y, c.y), iy2 = Math.min(a.y + a.d, c.y + c.d);
+  const iz1 = Math.max(a.z, c.z), iz2 = Math.min(a.z + a.h, c.z + c.h);
+  const e = 1e-6;
+  if (ix2 - ix1 < e || iy2 - iy1 < e || iz2 - iz1 < e) return [a];
+  const o = [];
+  if (ix1 - a.x > e) o.push(B(a.x, a.y, a.z, ix1 - a.x, a.d, a.h, a.t));
+  if (a.x + a.w - ix2 > e) o.push(B(ix2, a.y, a.z, a.x + a.w - ix2, a.d, a.h, a.t));
+  if (iy1 - a.y > e) o.push(B(ix1, a.y, a.z, ix2 - ix1, iy1 - a.y, a.h, a.t));
+  if (a.y + a.d - iy2 > e) o.push(B(ix1, iy2, a.z, ix2 - ix1, a.y + a.d - iy2, a.h, a.t));
+  if (iz1 - a.z > e) o.push(B(ix1, iy1, a.z, ix2 - ix1, iy2 - iy1, iz1 - a.z, a.t));
+  if (a.z + a.h - iz2 > e) o.push(B(ix1, iy1, iz2, ix2 - ix1, iy2 - iy1, a.z + a.h - iz2, a.t));
+  return o;
+}
+const subAll = (bs, c) => bs.flatMap(b => subtract(b, c));
+const splitZ = (bs, zc) => bs.flatMap(b => (b.z < zc - 1e-6 && b.z + b.h > zc + 1e-6) ? [B(b.x, b.y, b.z, b.w, b.d, zc - b.z, b.t), B(b.x, b.y, zc, b.w, b.d, b.z + b.h - zc, b.t)] : [b]);
+const bounds = bs => {
+  const r = { x1: Infinity, y1: Infinity, z1: Infinity, x2: -Infinity, y2: -Infinity, z2: -Infinity };
+  bs.forEach(b => { r.x1 = Math.min(r.x1, b.x); r.y1 = Math.min(r.y1, b.y); r.z1 = Math.min(r.z1, b.z); r.x2 = Math.max(r.x2, b.x + b.w); r.y2 = Math.max(r.y2, b.y + b.d); r.z2 = Math.max(r.z2, b.z + b.h); });
+  return r;
+};
+const bbBox = r => B(r.x1, r.y1, r.z1, r.x2 - r.x1, r.y2 - r.y1, r.z2 - r.z1);
+const C30 = Math.cos(Math.PI / 6), S30 = .5;
+const iso = (x, y, z) => [(x - y) * C30, (x + y) * S30 - z];
+
+function massSteps(W, D, n, fh) {
+  const H = n * fh, ops = $$('#m-ops input:checked').map(i => i.value);
+  let bs = [B(0, 0, 0, W, D, H)];
+  const clone = a => a.map(b => ({ ...b }));
+  const steps = [{ k: '기본 볼륨', en: `base volume ${W}x${D}m, ${n} floors`, bs: clone(bs), gh: [] }];
+  for (const op of ops) {
+    if (op === 'split') {
+      const g = Math.max(2, W * .08), c = B(W / 2 - g / 2, -100, n > 1 ? fh : 0, g, 300, 999);
+      bs = subAll(bs, c);
+      steps.push({ k: '매스 분절', en: 'split the volume into two masses with a slot above a shared podium', bs: clone(bs), gh: [B(W / 2 - g / 2, 0, n > 1 ? fh : 0, g, D, H - (n > 1 ? fh : 0))] });
+    }
+    if (op === 'court') {
+      const c = B(W * .32, D * .3, 0, W * .36, D * .4, 999);
+      bs = subAll(bs, c);
+      steps.push({ k: '중정 비우기', en: 'carve a central courtyard', bs: clone(bs), gh: [B(c.x, c.y, 0, c.w, c.d, H)] });
+    }
+    if (op === 'shift' && n > 1) {
+      const zc = Math.ceil(n / 2) * fh, dx = W * .16, dy = -D * .12;
+      bs = splitZ(bs, zc);
+      const up = bs.filter(b => b.z >= zc - 1e-6), gh = [bbBox(bounds(up))];
+      up.forEach(b => { b.x += dx; b.y += dy; });
+      steps.push({ k: '상부 매스 이동', en: 'shift the upper floors to create cantilevers and a covered terrace', bs: clone(bs), gh });
+    }
+    if (op === 'elevate' && n > 1) {
+      bs = splitZ(bs, fh);
+      const low = bs.filter(b => b.z < fh - 1e-6), r = bounds(low);
+      bs = bs.filter(b => b.z >= fh - 1e-6);
+      if (low.length) {
+        const cols = [], nx = Math.max(2, Math.round((r.x2 - r.x1) / 7) + 1), ny = Math.max(2, Math.round((r.y2 - r.y1) / 7) + 1), cs = .6;
+        for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+          if (i > 0 && i < nx - 1 && j > 0 && j < ny - 1) continue;
+          const x = r.x1 + (r.x2 - r.x1 - cs) * i / (nx - 1), y = r.y1 + (r.y2 - r.y1 - cs) * j / (ny - 1);
+          if (bs.some(b => b.z <= fh + 1e-6 && x >= b.x - 1e-6 && x + cs <= b.x + b.w + 1e-6 && y >= b.y - 1e-6 && y + cs <= b.y + b.d + 1e-6)) cols.push(B(x, y, 0, cs, cs, fh, 'col'));
+        }
+        const core = B(r.x1 + (r.x2 - r.x1) * .42, r.y1 + (r.y2 - r.y1) * .35, 0, (r.x2 - r.x1) * .14, (r.y2 - r.y1) * .3, fh, 'core');
+        bs = [...cols, core, ...bs];
+        steps.push({ k: '필로티 들어올리기', en: 'lift the mass on pilotis, leaving an open ground floor with a glazed core', bs: clone(bs), gh: low.map(b => ({ ...b })) });
+      }
+    }
+    if (op === 'terrace' && n > 2) {
+      const r = bounds(bs), D2 = r.y2 - r.y1, gh = [];
+      [.42, .22].forEach((p, k) => {
+        const z = r.z2 - (k + 1) * fh; if (z < fh) return;
+        const c = B(-999, r.y2 - D2 * p, z, 2999, D2 * p + 50, fh);
+        const before = bs; bs = subAll(bs, c);
+        before.forEach(b => { const ix1 = Math.max(b.x, c.x), ix2 = Math.min(b.x + b.w, c.x + c.w), iy1 = Math.max(b.y, c.y), iy2 = Math.min(b.y + b.d, c.y + c.d), iz1 = Math.max(b.z, c.z), iz2 = Math.min(b.z + b.h, c.z + c.h); if (ix2 > ix1 && iy2 > iy1 && iz2 > iz1) gh.push(B(ix1, iy1, iz1, ix2 - ix1, iy2 - iy1, iz2 - iz1)); });
+      });
+      steps.push({ k: '계단식 테라스', en: 'cut stepped roof terraces on the upper floors', bs: clone(bs), gh });
+    }
+  }
+  return { steps, H };
+}
+
+function drawBoxes(bs, s, ox, oy, fh) {
+  const P = (x, y, z) => { const p = iso(x, y, z); return [ox + p[0] * s, oy + p[1] * s]; };
+  const sorted = [...bs].sort((a, b) => ((a.x + a.w / 2) + (a.y + a.d / 2) + (a.z + a.h / 2) * .5) - ((b.x + b.w / 2) + (b.y + b.d / 2) + (b.z + b.h / 2) * .5));
+  let o = '';
+  for (const b of sorted) {
+    const x2 = b.x + b.w, y2 = b.y + b.d, z2 = b.z + b.h;
+    const top = b.t === 'core' ? '#f4ddd3' : '#ffffff', rgt = b.t === 'core' ? '#e2b6a5' : '#dcd7cc', lft = b.t === 'core' ? '#c98d77' : '#b9b2a4';
+    const fs = { strokeWidth: .6, strokeLinejoin: 'round' };
+    o += poly([P(x2, b.y, b.z), P(x2, y2, b.z), P(x2, y2, z2), P(x2, b.y, z2)], { fill: rgt, stroke: rgt, ...fs });
+    o += poly([P(b.x, y2, b.z), P(x2, y2, b.z), P(x2, y2, z2), P(b.x, y2, z2)], { fill: lft, stroke: lft, ...fs });
+    o += poly([P(b.x, b.y, z2), P(x2, b.y, z2), P(x2, y2, z2), P(b.x, y2, z2)], { fill: top, stroke: top, ...fs });
+    if (!b.t && fh) for (let z = Math.ceil((b.z + .01) / fh) * fh; z < z2 - .01; z += fh) {
+      o += pline([P(x2, b.y, z), P(x2, y2, z), P(b.x, y2, z)], { fill: 'none', stroke: '#8f887b', strokeWidth: .45 });
+    }
+    // crisp outer edges
+    o += pline([P(b.x, y2, b.z), P(x2, y2, b.z), P(x2, b.y, b.z)], { fill: 'none', stroke: INK, strokeWidth: .7 });
+    o += line(...P(x2, y2, b.z), ...P(x2, y2, z2), { stroke: INK, strokeWidth: .7 });
+  }
+  return o;
+}
+function wire(b, s, ox, oy) {
+  const P = (x, y, z) => { const p = iso(x, y, z); return [ox + p[0] * s, oy + p[1] * s]; };
+  const x2 = b.x + b.w, y2 = b.y + b.d, z2 = b.z + b.h, st = { stroke: ACC, strokeWidth: 1, strokeDasharray: '4 3', fill: 'none' };
+  return pline([P(b.x, b.y, z2), P(x2, b.y, z2), P(x2, y2, z2), P(b.x, y2, z2), P(b.x, b.y, z2)], st) +
+    pline([P(x2, b.y, b.z), P(x2, y2, b.z), P(b.x, y2, b.z)], st) +
+    [[x2, b.y], [x2, y2], [b.x, y2]].map(([x, y]) => line(...P(x, y, b.z), ...P(x, y, z2), st)).join('');
+}
+
+function drawMass() {
+  const W = clamp(num('m-w'), 4, 200), D = clamp(num('m-d'), 4, 200), n = clamp(Math.round(num('m-n')), 1, 40), fh = clamp(num('m-fh'), 2, 10);
+  const { steps } = massSteps(W, D, n, fh);
+  const cnt = steps.length, cols = Math.min(cnt, 3), rows = Math.ceil(cnt / cols);
+  const ax = 40, ay = 40, aw = 920, ah = 585, cw = aw / cols, ch = ah / rows;
+  // common bbox in unit iso space
+  let mnx = Infinity, mny = Infinity, mxx = -Infinity, mxy = -Infinity;
+  const site = B(-3, -3, 0, W + 6 + W * .16, D + 6, 0);
+  steps.forEach(st => [...st.bs, ...st.gh, site].forEach(b => {
+    for (const x of [b.x, b.x + b.w]) for (const y of [b.y, b.y + b.d]) for (const z of [b.z, b.z + b.h]) { const p = iso(x, y, z); mnx = Math.min(mnx, p[0]); mxx = Math.max(mxx, p[0]); mny = Math.min(mny, p[1]); mxy = Math.max(mxy, p[1]); }
+  }));
+  const s = Math.min((cw - 30) / (mxx - mnx), (ch - 56) / (mxy - mny));
+  let o = '';
+  steps.forEach((st, i) => {
+    const c = i % cols, r = Math.floor(i / cols), cx = ax + c * cw, cy = ay + r * ch;
+    const ox = cx + cw / 2 - (mnx + mxx) / 2 * s, oy = cy + 40 + (ch - 56) / 2 - (mny + mxy) / 2 * s;
+    const P = (x, y, z) => { const p = iso(x, y, z); return [ox + p[0] * s, oy + p[1] * s]; };
+    o += poly([P(site.x, site.y, 0), P(site.x + site.w, site.y, 0), P(site.x + site.w, site.y + site.d, 0), P(site.x, site.y + site.d, 0)], { fill: '#f1ede4', stroke: LIGHT, strokeWidth: .7 });
+    o += drawBoxes(st.bs, s, ox, oy, fh);
+    st.gh.forEach(g => o += wire(g, s, ox, oy));
+    o += text(cx + 14, cy + 20, String(i + 1).padStart(2, '0'), { fontSize: 18, fontWeight: 700, fill: i === cnt - 1 ? ACC : INK, fontFamily: MONO });
+    o += text(cx + 46, cy + 19, st.k, { fontSize: 13, fontWeight: 700 });
+    if (i < cnt - 1 && c < cols - 1) o += line(cx + cw - 14, cy + ch / 2, cx + cw + 6, cy + ch / 2, { stroke: ACC, strokeWidth: 1.4, markerEnd: 'url(#arr)' });
+    if (c > 0) o += line(cx, cy + 34, cx, cy + ch - 10, { stroke: LIGHT, strokeWidth: .5 });
+  });
+  o += frame('매스 진화 다이어그램', 'N.T.S.', 'D-101');
+  return {
+    title: '매스 진화 다이어그램', meta: `${W}×${D}m · ${n}F · ${steps.length} steps`, svg: svgWrap(o),
+    prompt: {
+      type: 'architectural massing evolution diagram',
+      parts: [
+        ['도면 유형', `architectural massing evolution diagram of a ${USE_EN[G.use]}, ${steps.length} sequential steps arranged in a grid and read left to right`],
+        ['단계', steps.map((s, i) => `(${i + 1}) ${s.en}`).join(', ')],
+        ['투상', 'identical isometric axonometric view for every step, same camera and scale'],
+        ['표현', 'white volumes with two gray tones on side faces, thin floor lines, red dashed outlines for removed or moved volumes, small arrows between steps, step numbers'],
+        ['맥락', `site plate only, ${CTX_EN[G.context]}, no surrounding buildings`],
+      ],
+      neg: ['perspective camera', 'realistic textures', 'inconsistent scale between steps', 'shadows on ground'],
+      ko: `${steps.length}단계 매스 진화 다이어그램. 모든 단계를 같은 액소 시점·축척으로 고정하고, 빠지거나 이동한 볼륨은 붉은 점선으로 표시하도록 지시합니다.`,
+    }
+  };
+}
+
+const GROUP_COL = ['#c14a2b', '#4a5a3e', '#b07d2a', '#3f5c6e', '#7a5c7a', '#6e6862'];
+function drawBubble() {
+  const prog = $('#b-prog').value.split('\n').map(l => l.split(/[,，\t]/).map(s => s.trim())).filter(a => a[0] && parseFloat(a[1]) > 0)
+    .map(a => ({ name: a[0], area: parseFloat(a[1]), g: a[2] || '기타' }));
+  const groups = [...new Set(prog.map(p => p.g))];
+  const idx = Object.fromEntries(prog.map((p, i) => [p.name, i]));
+  const links = $('#b-adj').value.split('\n').map(l => l.split(/[-–—~]/).map(s => s.trim())).filter(a => a.length === 2 && idx[a[0]] !== undefined && idx[a[1]] !== undefined).map(a => [idx[a[0]], idx[a[1]]]);
+  const cx = 470, cy = 335, tot = prog.reduce((s, p) => s + p.area, 0) || 1;
+  const k = Math.sqrt(.2 * 820 * 540 / (Math.PI * tot));
+  const N = prog.map((p, i) => { const a = i / prog.length * Math.PI * 2; return { ...p, r: Math.max(16, Math.sqrt(p.area) * k), x: cx + Math.cos(a) * 160, y: cy + Math.sin(a) * 120 }; });
+  for (let it = 0; it < 500; it++) {
+    const al = 1 - it / 500;
+    links.forEach(([a, b]) => { const A = N[a], Bn = N[b], dx = Bn.x - A.x, dy = Bn.y - A.y, d = Math.hypot(dx, dy) || 1, t = A.r + Bn.r + 26, f = (d - t) / d * .08 * al; A.x += dx * f; A.y += dy * f; Bn.x -= dx * f; Bn.y -= dy * f; });
+    for (let i = 0; i < N.length; i++) for (let j = i + 1; j < N.length; j++) {
+      const A = N[i], Bn = N[j], dx = Bn.x - A.x, dy = Bn.y - A.y, d = Math.hypot(dx, dy) || .01, t = A.r + Bn.r + 18;
+      if (d < t) { const f = (t - d) / d * .5; A.x -= dx * f; A.y -= dy * f; Bn.x += dx * f; Bn.y += dy * f; }
+    }
+    N.forEach(p => { p.x += (cx - p.x) * .012; p.y += (cy - p.y) * .016; p.x = clamp(p.x, 60 + p.r, 820 - p.r); p.y = clamp(p.y, 60 + p.r, 620 - p.r); });
+  }
+  let o = '';
+  links.forEach(([a, b]) => { const A = N[a], Q = N[b], d = Math.hypot(Q.x - A.x, Q.y - A.y) || 1, ux = (Q.x - A.x) / d, uy = (Q.y - A.y) / d; if (d > A.r + Q.r) o += line(A.x + ux * A.r, A.y + uy * A.r, Q.x - ux * Q.r, Q.y - uy * Q.r, { stroke: INK, strokeWidth: 1.4 }) + circ(A.x + ux * A.r, A.y + uy * A.r, 2.2, { fill: INK }) + circ(Q.x - ux * Q.r, Q.y - uy * Q.r, 2.2, { fill: INK }); });
+  N.forEach(p => {
+    const col = GROUP_COL[groups.indexOf(p.g) % GROUP_COL.length];
+    o += circ(p.x, p.y, p.r, { fill: col, fillOpacity: .16, stroke: col, strokeWidth: 1.4 });
+    o += text(p.x, p.y - 1, p.name, { fontSize: clamp(p.r / 3.2, 10, 15), fontWeight: 700, textAnchor: 'middle' });
+    o += text(p.x, p.y + 14, p.area + '㎡', { fontSize: 9.5, fontFamily: MONO, fill: GRAY, textAnchor: 'middle' });
+  });
+  let ly = 70;
+  o += text(838, ly - 14, 'PROGRAM', { fontSize: 9, fontFamily: MONO, fill: GRAY, letterSpacing: '.08em' });
+  groups.forEach((g, i) => { const col = GROUP_COL[i % GROUP_COL.length]; const a = prog.filter(p => p.g === g).reduce((s, p) => s + p.area, 0); o += circ(846, ly + 4, 6, { fill: col, fillOpacity: .2, stroke: col }); o += text(860, ly + 8, `${g}  ${a}㎡`, { fontSize: 11.5 }); ly += 22; });
+  o += line(838, ly + 6, 960, ly + 6, { stroke: INK, strokeWidth: .5 }) + text(838, ly + 24, `합계 ${tot}㎡`, { fontSize: 12, fontWeight: 700 });
+  o += line(838, ly + 46, 870, ly + 46, { stroke: INK, strokeWidth: 1.2 }) + text(878, ly + 50, '인접 필요', { fontSize: 11 });
+  o += frame('프로그램 버블 다이어그램', 'N.T.S.', 'D-102');
+  return {
+    title: '프로그램 버블 다이어그램', meta: `${prog.length} programs · ${links.length} links`, svg: svgWrap(o),
+    prompt: {
+      type: 'program bubble diagram',
+      parts: [
+        ['도면 유형', `architectural program bubble diagram for a ${USE_EN[G.use]}, circles sized by floor area`],
+        ['프로그램', prog.map(p => `${p.name} ${p.area}㎡`).join(', ')],
+        ['관계', links.length ? 'connecting lines for required adjacencies: ' + links.map(([a, b]) => `${prog[a].name}–${prog[b].name}`).join(', ') : 'no fixed adjacencies'],
+        ['표현', `color-coded by group (${groups.join(', ')}), translucent fills with solid outlines, labels inside circles, small legend`],
+        ['구도', 'top-down flat diagram, generous white space, no building'],
+      ],
+      neg: ['3d', 'perspective', 'overlapping circles', 'random extra labels'],
+      ko: `${prog.length}개 실을 면적 비례 원으로, 인접 관계는 연결선으로 지시합니다. 한글 라벨이 깨지면 실명을 영문으로 바꿔 넣으세요.`,
+    }
+  };
+}
+
+const DIRS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+const DIR_KO = { N: '북', NE: '북동', E: '동', SE: '남동', S: '남', SW: '남서', W: '서', NW: '북서' };
+function sunPos(lat, doy, hr) {
+  const dec = 23.44 * Math.sin((2 * Math.PI / 365) * (284 + doy)) * Math.PI / 180, ph = lat * Math.PI / 180, H = (hr - 12) * 15 * Math.PI / 180;
+  const alt = Math.asin(Math.sin(ph) * Math.sin(dec) + Math.cos(ph) * Math.cos(dec) * Math.cos(H));
+  const az = Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(ph) - Math.tan(dec) * Math.cos(ph)) + Math.PI; // from north, clockwise
+  return { alt, az };
+}
+function drawEnv() {
+  const lat = clamp(num('e-lat'), 0, 66), Hb = Math.max(1, num('e-h')), W = Math.max(2, num('e-w')), D = Math.max(2, num('e-d')), rot = num('e-rot');
+  const ws = $('#e-ws').value, ww = $('#e-ww').value;
+  const cx = 430, cy = 330, R = 250;
+  let o = circ(cx, cy, R, { fill: '#fbf9f4', stroke: INK, strokeWidth: .8 });
+  [30, 60].forEach(a => o += circ(cx, cy, R * (1 - a / 90), { fill: 'none', stroke: LIGHT, strokeWidth: .6, strokeDasharray: '3 3' }));
+  for (let a = 0; a < 360; a += 30) { const t = a * Math.PI / 180; o += line(cx + Math.sin(t) * (R - 6), cy - Math.cos(t) * (R - 6), cx + Math.sin(t) * R, cy - Math.cos(t) * R, { stroke: INK, strokeWidth: .7 }); }
+  DIRS.forEach((d, i) => { const t = i * 45 * Math.PI / 180; o += text(cx + Math.sin(t) * (R + 16), cy - Math.cos(t) * (R + 16) + 4, d, { fontSize: 10.5, fontFamily: MONO, fontWeight: 600, textAnchor: 'middle' }); });
+  const P = (alt, az) => { const r = R * (1 - alt / (Math.PI / 2)); return [cx + Math.sin(az) * r, cy - Math.cos(az) * r]; };
+  const days = [[172, '하지 6/21', ACC], [80, '춘추분 3/21', '#b07d2a'], [355, '동지 12/21', '#3f5c6e']];
+  days.forEach(([doy, lab, col]) => {
+    const pts = [];
+    for (let h = 4; h <= 20; h += .25) { const s = sunPos(lat, doy, h); if (s.alt > 0) pts.push(P(s.alt, s.az)); }
+    if (pts.length > 1) o += pline(pts, { fill: 'none', stroke: col, strokeWidth: 1.6 });
+    for (let h = 6; h <= 18; h += 3) { const s = sunPos(lat, doy, h); if (s.alt > 0) { const p = P(s.alt, s.az); o += circ(p[0], p[1], 3, { fill: col }); if (doy === 172) o += text(p[0] + 5, p[1] - 5, h + '시', { fontSize: 9, fontFamily: MONO, fill: col }); } }
+  });
+  // building + winter noon shadow
+  const sc = Math.min(150 / Math.max(W, D), 7), t = rot * Math.PI / 180;
+  const corner = (x, y) => [cx + (x * Math.cos(t) - y * Math.sin(t)) * sc, cy + (x * Math.sin(t) + y * Math.cos(t)) * sc];
+  const fp = [[-W / 2, -D / 2], [W / 2, -D / 2], [W / 2, D / 2], [-W / 2, D / 2]].map(p => corner(...p));
+  const sw = sunPos(lat, 355, 12), L = Math.min(Hb / Math.tan(sw.alt), 400) * sc;
+  const dx = -Math.sin(sw.az) * L, dy = Math.cos(sw.az) * L; // shadow points away from sun
+  const sh = fp.map(p => [p[0] + dx, p[1] + dy]);
+  // shadow hull: union of footprint and its translation (convex hull)
+  const hull = pts => { pts = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]); const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]); const lo = [], up = []; for (const p of pts) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); } for (const p of pts.slice().reverse()) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); } return lo.slice(0, -1).concat(up.slice(0, -1)); };
+  o += `<clipPath id="envc"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>`;
+  o += `<g clip-path="url(#envc)">` + poly(hull([...fp, ...sh]), { fill: '#3f5c6e', fillOpacity: .16, stroke: '#3f5c6e', strokeWidth: .6, strokeDasharray: '3 2' }) + '</g>';
+  o += poly(fp, { fill: INK });
+  // wind arrows
+  const wind = (dir, col, lab, off) => {
+    const a = DIRS.indexOf(dir) * 45 * Math.PI / 180; let s = '';
+    for (let k = -1; k <= 1; k++) {
+      const px = -Math.cos(a) * k * 26 + off * Math.cos(a), py = -Math.sin(a) * k * 26 + off * Math.sin(a);
+      const x1 = cx + Math.sin(a) * (R - 20) + px, y1 = cy - Math.cos(a) * (R - 20) + py, x2 = cx + Math.sin(a) * 120 + px, y2 = cy - Math.cos(a) * 120 + py;
+      s += line(x1, y1, x2, y2, { stroke: col, strokeWidth: 2, strokeDasharray: '10 5', markerEnd: 'url(#arrk)' });
+    }
+    return s + text(cx + Math.sin(a) * (R - 40) + 12, cy - Math.cos(a) * (R - 40) - 10, lab, { fontSize: 10.5, fontWeight: 700, fill: col });
+  };
+  o += wind(ws, ACC, '여름풍', 0) + wind(ww, '#3f5c6e', '겨울풍', ws === ww ? 60 : 0);
+  // legend
+  let ly = 80;
+  o += text(728, ly - 18, `SUN PATH · ${lat}°N`, { fontSize: 9, fontFamily: MONO, fill: GRAY, letterSpacing: '.06em' });
+  days.forEach(([doy, lab, col]) => { const noon = sunPos(lat, doy, 12); o += line(728, ly, 758, ly, { stroke: col, strokeWidth: 2 }) + text(766, ly + 4, `${lab}  남중 ${Math.round(noon.alt * 180 / Math.PI)}°`, { fontSize: 11.5 }); ly += 22; });
+  o += rect(728, ly - 6, 30, 12, { fill: '#3f5c6e', fillOpacity: .16, stroke: '#3f5c6e', strokeDasharray: '3 2' }) + text(766, ly + 4, `동지 정오 그림자 (H ${Hb}m)`, { fontSize: 11.5 }); ly += 22;
+  o += line(728, ly, 758, ly, { stroke: ACC, strokeWidth: 2, strokeDasharray: '10 5' }) + text(766, ly + 4, `여름 주풍 ${DIR_KO[ws]}풍`, { fontSize: 11.5 }); ly += 22;
+  o += line(728, ly, 758, ly, { stroke: '#3f5c6e', strokeWidth: 2, strokeDasharray: '10 5' }) + text(766, ly + 4, `겨울 주풍 ${DIR_KO[ww]}풍`, { fontSize: 11.5 }); ly += 30;
+  o += text(728, ly, '동심원: 태양고도 0° / 30° / 60°', { fontSize: 10.5, fill: GRAY });
+  o += frame('환경 분석 다이어그램', 'N.T.S.', 'D-103');
+  const wsn = sunPos(lat, 355, 12).alt * 180 / Math.PI, ssn = sunPos(lat, 172, 12).alt * 180 / Math.PI;
+  const dirEn = { N: 'north', NE: 'northeast', E: 'east', SE: 'southeast', S: 'south', SW: 'southwest', W: 'west', NW: 'northwest' };
+  return {
+    title: '환경 분석 다이어그램', meta: `${lat}°N · 하지 ${Math.round(ssn)}° / 동지 ${Math.round(wsn)}°`, svg: svgWrap(o),
+    prompt: {
+      type: 'environmental analysis diagram',
+      parts: [
+        ['도면 유형', `environmental site analysis diagram for a ${USE_EN[G.use]} ${CTX_EN[G.context]}`],
+        ['일조', `top-down site plan with a polar sun-path chart at latitude ${lat}°N: summer solstice arc (noon altitude ${Math.round(ssn)}°), equinox arc and winter solstice arc (noon altitude ${Math.round(wsn)}°), hour dots`],
+        ['바람', `dashed wind arrows: summer prevailing wind from the ${dirEn[ws]}, winter prevailing wind from the ${dirEn[ww]}`],
+        ['매스', `solid black ${W}x${D}m building footprint rotated ${rot}° with its winter noon shadow as a translucent blue area`],
+        ['표현', 'compass ring with N/NE/E labels, concentric altitude rings, thin legend on the right'],
+      ],
+      neg: ['3d terrain', 'clouds', 'decorative sun icons', 'wrong compass orientation'],
+      ko: `위도 ${lat}° 기준 실제 태양 궤적·남중고도를 계산해 넣었습니다. 바람·그림자 방향을 그대로 유지하도록 지시합니다.`,
+    }
+  };
+}
+
+/* =========================================================
+   02  FLOOR PLAN
+   ========================================================= */
+const WET = /욕실|화장실|wc|bath|toilet|창고|stor|드레스|팬트리|다용도/i;
+const EN_ROOM = [[/현관|entr/i, 'entrance'], [/로비|lobby/i, 'lobby'], [/거실|living/i, 'living room'], [/주방|kitchen/i, 'kitchen'], [/식당|다이닝|dining/i, 'dining room'], [/욕실|화장실|bath|wc/i, 'bathroom'], [/침실|bed/i, 'bedroom'], [/드레스|dress/i, 'walk-in closet'], [/서재|study/i, 'study'], [/다용도|utility/i, 'utility room'], [/회의|meeting/i, 'meeting room'], [/사무|office/i, 'office'], [/창고|stor/i, 'storage'], [/카페|cafe/i, 'cafe'], [/테라스|terrace/i, 'terrace'], [/라운지|lounge/i, 'lounge']];
+const roomEn = n => { for (const [r, e] of EN_ROOM) if (r.test(n)) return e + (n.match(/\d+$/) ? ' ' + n.match(/\d+$/)[0] : ''); return n; };
+function partition(items, r) {
+  if (items.length === 1) return [{ ...items[0], ...r }];
+  const tot = items.reduce((s, i) => s + i.area, 0);
+  let acc = 0, best = 1, bd = Infinity;
+  for (let k = 1; k < items.length; k++) { acc += items[k - 1].area; const d = Math.abs(acc - tot / 2); if (d < bd) { bd = d; best = k; } }
+  const A = items.slice(0, best), Bb = items.slice(best), ra = A.reduce((s, i) => s + i.area, 0) / tot;
+  if (r.w >= r.h) { const w1 = Math.round(r.w * ra * 10) / 10; return [...partition(A, { x: r.x, y: r.y, w: w1, h: r.h }), ...partition(Bb, { x: r.x + w1, y: r.y, w: r.w - w1, h: r.h })]; }
+  const h1 = Math.round(r.h * ra * 10) / 10; return [...partition(A, { x: r.x, y: r.y, w: r.w, h: h1 }), ...partition(Bb, { x: r.x, y: r.y + h1, w: r.w, h: r.h - h1 })];
+}
+function drawPlan() {
+  const W = clamp(num('p-w'), 3, 200), D = clamp(num('p-d'), 3, 200), to = clamp(num('p-to'), 50, 800) / 1000, ti = clamp(num('p-ti'), 50, 400) / 1000;
+  const rooms0 = $('#p-rooms').value.split('\n').map(l => l.trim().match(/^(.+?)\s+([\d.]+)\s*(㎡|m2)?$/)).filter(Boolean).map(m => ({ name: m[1].trim(), area: parseFloat(m[2]) })).filter(r => r.area > 0);
+  if (!rooms0.length) rooms0.push({ name: '실', area: 1 });
+  const rooms = partition(rooms0, { x: 0, y: 0, w: W, h: D });
+  const s = Math.min(800 / W, 440 / D), ox = 500 - W * s / 2 + 20, oy = 120 + (440 - D * s) / 2;
+  const X = x => ox + x * s, Y = y => oy + y * s, e = 1e-3;
+  const onB = (r, side) => side === 'top' ? r.y < e : side === 'bottom' ? r.y + r.h > D - e : side === 'left' ? r.x < e : r.x + r.w > W - e;
+  const edges = r => [
+    { side: 'top', P: [r.x, r.y], u: [1, 0], n: [0, 1], len: r.w }, { side: 'bottom', P: [r.x, r.y + r.h], u: [1, 0], n: [0, -1], len: r.w },
+    { side: 'left', P: [r.x, r.y], u: [0, 1], n: [1, 0], len: r.h }, { side: 'right', P: [r.x + r.w, r.y], u: [0, 1], n: [-1, 0], len: r.h }];
+  let o = '', over = '';
+  // furniture first (under walls)
+  if (chk('p-furn')) rooms.forEach(r => o += furniture(r, X, Y, s));
+  // interior walls
+  rooms.forEach(r => o += rect(X(r.x), Y(r.y), r.w * s, r.h * s, { fill: 'none', stroke: '#2a2722', strokeWidth: Math.max(1.5, ti * s) }));
+  // outer poché
+  const a = to / 2;
+  o += path(`M${X(-a)} ${Y(-a)}H${X(W + a)}V${Y(D + a)}H${X(-a)}Z M${X(a)} ${Y(a)}V${Y(D - a)}H${X(W - a)}V${Y(a)}Z`, { fill: INK, fillRule: 'evenodd' });
+  // openings
+  const opening = (P, u, n, off, w, th, fill = PAPER) => {
+    const H0 = [P[0] + u[0] * off, P[1] + u[1] * off], H1 = [H0[0] + u[0] * w, H0[1] + u[1] * w];
+    return poly([[H0[0] - n[0] * th, H0[1] - n[1] * th], [H1[0] - n[0] * th, H1[1] - n[1] * th], [H1[0] + n[0] * th, H1[1] + n[1] * th], [H0[0] + n[0] * th, H0[1] + n[1] * th]].map(p => [X(p[0]), Y(p[1])]), { fill, stroke: 'none' });
+  };
+  const door = (E, off, dw, th) => {
+    const H0 = [E.P[0] + E.u[0] * off, E.P[1] + E.u[1] * off];
+    const A1 = [H0[0] + E.u[0] * dw, H0[1] + E.u[1] * dw], L1 = [H0[0] + E.n[0] * dw, H0[1] + E.n[1] * dw];
+    const cr = E.u[0] * E.n[1] - E.u[1] * E.n[0];
+    return opening(E.P, E.u, E.n, off, dw, th) + line(X(H0[0]), Y(H0[1]), X(L1[0]), Y(L1[1]), { stroke: INK, strokeWidth: 1.3 }) +
+      path(`M${f2(X(A1[0]))} ${f2(Y(A1[1]))} A${f2(dw * s)} ${f2(dw * s)} 0 0 ${cr > 0 ? 1 : 0} ${f2(X(L1[0]))} ${f2(Y(L1[1]))}`, { fill: 'none', stroke: INK, strokeWidth: .6 });
+  };
+  const entryIdx = Math.max(0, rooms.findIndex(r => /현관|로비|입구|entr|lobby/i.test(r.name)));
+  const entryEdge = (() => { const ext = edges(rooms[entryIdx]).filter(E => onB(rooms[entryIdx], E.side) && E.len > 1.4); return ext.find(q => q.side === 'bottom') || ext[0]; })();
+  rooms.forEach((r, i) => {
+    const es = edges(r);
+    // windows on exterior edges
+    es.filter(E => onB(r, E.side)).forEach(E => {
+      if (i === entryIdx && entryEdge && E.side === entryEdge.side) return;
+      const wet = WET.test(r.name); if (wet && !/욕실|화장실|bath/i.test(r.name)) return;
+      const ww = wet ? Math.min(.6, E.len * .4) : Math.min(E.len * .5, 2.4); if (ww < .4) return;
+      const off = (E.len - ww) / 2, outN = [-E.n[0], -E.n[1]], mid = [E.P[0] + outN[0] * a * 0, E.P[1] + outN[1] * a * 0];
+      over += opening(E.P, E.u, E.n, off, ww, a + .005);
+      const H0 = [E.P[0] + E.u[0] * off, E.P[1] + E.u[1] * off], H1 = [H0[0] + E.u[0] * ww, H0[1] + E.u[1] * ww];
+      [-a, 0, a].forEach(k => over += line(X(H0[0] + E.n[0] * k), Y(H0[1] + E.n[1] * k), X(H1[0] + E.n[0] * k), Y(H1[1] + E.n[1] * k), { stroke: INK, strokeWidth: k ? .9 : .5 }));
+      over += line(X(H0[0] - E.n[0] * a), Y(H0[1] - E.n[1] * a), X(H0[0] + E.n[0] * a), Y(H0[1] + E.n[1] * a), { stroke: INK, strokeWidth: .9 }) + line(X(H1[0] - E.n[0] * a), Y(H1[1] - E.n[1] * a), X(H1[0] + E.n[0] * a), Y(H1[1] + E.n[1] * a), { stroke: INK, strokeWidth: .9 });
+    });
+    // interior door on longest interior edge
+    const ins = es.filter(E => !onB(r, E.side) && E.len > 1.3).sort((p, q) => q.len - p.len);
+    if (ins.length) { const E = ins[0], dw = Math.min(.9, E.len - .4); over += door(E, .2, dw, ti / 2 + .01); }
+    // entry door
+    if (i === entryIdx) {
+      const E = entryEdge && es.find(q => q.side === entryEdge.side);
+      if (E) {
+        const dw = Math.min(1.0, E.len - .4), off = (E.len - dw) / 2; over += door(E, off, dw, a + .01);
+        const mx = E.P[0] + E.u[0] * (off + dw / 2), my = E.P[1] + E.u[1] * (off + dw / 2), ax = mx - E.n[0] * 1.6, ay = my - E.n[1] * 1.6;
+        over += line(X(ax), Y(ay), X(mx - E.n[0] * .5), Y(my - E.n[1] * .5), { stroke: ACC, strokeWidth: 1.6, markerEnd: 'url(#arr)' });
+        over += text(X(ax) + (E.n[0] ? -E.n[0] * 10 : 8), Y(ay) + (E.n[1] ? -E.n[1] * 10 + 4 : 4), 'ENT.', { fontSize: 9.5, fontFamily: MONO, fill: ACC, fontWeight: 600, textAnchor: E.n[0] > 0 ? 'end' : 'start' });
+      }
+    }
+  });
+  o += over;
+  // labels
+  rooms.forEach(r => {
+    const fs = clamp(Math.min(r.w, r.h) * s / 6, 9, 14), lx = X(r.x + r.w / 2), ly = Y(r.y + r.h / 2);
+    o += text(lx, ly - 2, r.name, { fontSize: fs, fontWeight: 700, textAnchor: 'middle', stroke: PAPER, strokeWidth: 3, paintOrder: 'stroke' });
+    o += text(lx, ly + fs, (r.w * r.h).toFixed(1) + '㎡', { fontSize: fs * .78, fontFamily: MONO, fill: GRAY, textAnchor: 'middle', stroke: PAPER, strokeWidth: 3, paintOrder: 'stroke' });
+  });
+  // dims
+  if (chk('p-dim')) {
+    const xs = [...new Set(rooms.filter(r => r.y < e).flatMap(r => [r.x, r.x + r.w]).map(v => f2(v)))].sort((p, q) => p - q);
+    const ys = [...new Set(rooms.filter(r => r.x < e).flatMap(r => [r.y, r.y + r.h]).map(v => f2(v)))].sort((p, q) => p - q);
+    const yA = Y(-a) - 22, yB = yA - 22, xA = X(-a) - 22, xB = xA - 22;
+    for (let i = 0; i < xs.length - 1; i++) o += dimH(X(xs[i]), X(xs[i + 1]), yA, mm(xs[i + 1] - xs[i]));
+    o += dimH(X(0), X(W), yB, mm(W));
+    for (let i = 0; i < ys.length - 1; i++) o += dimV(Y(ys[i]), Y(ys[i + 1]), xA, mm(ys[i + 1] - ys[i]));
+    o += dimV(Y(0), Y(D), xB, mm(D));
+    xs.forEach(x => o += line(X(x), Y(-a) - 4, X(x), yB - 4, { stroke: INK, strokeWidth: .35 }));
+    ys.forEach(y => o += line(X(-a) - 4, Y(y), xB - 4, Y(y), { stroke: INK, strokeWidth: .35 }));
+  }
+  if (chk('p-north')) { o += northArrow(930, 82); o += scaleBar(48, 606, s); }
+  o += text(48, 50, 'FLOOR PLAN', { fontSize: 9, fontFamily: MONO, fill: GRAY, letterSpacing: '.1em' }) + text(48, 70, `1층 평면도 · ${(W * D).toFixed(1)}㎡`, { fontSize: 15, fontWeight: 700 });
+  o += frame('평면도', scaleTxt(s), 'A-101');
+  return {
+    title: '평면도', meta: `${W}×${D}m · ${rooms.length} rooms · ${(W * D).toFixed(1)}㎡`, svg: svgWrap(o),
+    prompt: {
+      type: 'architectural floor plan',
+      parts: [
+        ['도면 유형', `architectural floor plan of a ${USE_EN[G.use]}, strict top-down orthographic view`],
+        ['외곽', `rectangular footprint ${W} m x ${D} m (${(W * D).toFixed(0)} m²), ${Math.round(to * 1000)} mm thick exterior walls in solid black poché`],
+        ['실 구성', rooms.map(r => `${roomEn(r.name)} ${(r.w * r.h).toFixed(0)}m²`).join(', ')],
+        ['기호', 'door swing arcs, thin triple-line window symbols, entrance arrow' + (chk('p-dim') ? ', dimension chains on top and left' : '') + (chk('p-north') ? ', north arrow and scale bar' : '')],
+        chk('p-furn') ? ['가구', 'simple furniture layout: beds, sofa, dining table, kitchen counter, sanitary fixtures in thin gray lines'] : null,
+      ].filter(Boolean),
+      neg: ['perspective', '3d view', 'tilted camera', 'curved walls', 'missing doors', 'rooms overlapping'],
+      ko: `${rooms.length}개 실 배치를 실명·면적까지 프롬프트에 고정했습니다. PNG를 첨부하면 벽·창·문 위치가 유지된 채 스타일만 바뀝니다.`,
+    }
+  };
+}
+function furniture(r, X, Y, s) {
+  const st = { fill: 'none', stroke: GRAY, strokeWidth: .8 }, n = r.name, cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+  const R = (x, y, w, h, o2) => rect(X(x), Y(y), w * s, h * s, { ...st, ...o2 });
+  const fits = (w, h) => r.w > w + .6 && r.h > h + .6;
+  let o = '';
+  if (/침실|bed/i.test(n)) {
+    const bw = /1$|안방|master/i.test(n) ? 1.6 : 1.1, bl = 2.0;
+    if (fits(bw, bl)) { const x = cx - bw / 2, y = r.y + .15; o += R(x, y, bw, bl) + R(x + .1, y + .1, bw / 2 - .15, .4) + R(x + bw / 2 + .05, y + .1, bw / 2 - .15, .4) + line(X(x), Y(y + .65), X(x + bw), Y(y + .65), st); }
+  } else if (/거실|living|라운지|lounge/i.test(n)) {
+    if (fits(2.4, 2.2)) { const x = cx - 1.2, y = r.y + r.h - 1.05; o += R(x, y, 2.4, .9) + R(x + .15, y + .15, 2.1, .55) + R(cx - .6, y - 1.0, 1.2, .55); o += R(cx - 1, r.y + .15, 2, .4); }
+  } else if (/주방|kitchen/i.test(n)) {
+    const len = Math.min(r.w - .3, 3.6);
+    if (r.h > 1.6 && len > 1.2) { o += R(r.x + .15, r.y + .15, len, .6); o += circ(X(r.x + .15 + len * .3), Y(r.y + .45), .18 * s, st) + circ(X(r.x + .15 + len * .3 + .45), Y(r.y + .45), .18 * s, st) + R(r.x + .15 + len * .7, r.y + .25, .5, .4); }
+  } else if (/식당|다이닝|dining|회의|meeting/i.test(n)) {
+    const tw = Math.min(1.8, r.w - 1.4), th = Math.min(.9, r.h - 1.4);
+    if (tw > .8 && th > .6) { o += R(cx - tw / 2, cy - th / 2, tw, th); const k = Math.max(2, Math.floor(tw / .6)); for (let i = 0; i < k; i++) { const x = cx - tw / 2 + tw * (i + .5) / k - .2; o += R(x, cy - th / 2 - .5, .4, .4) + R(x, cy + th / 2 + .1, .4, .4); } }
+  } else if (/욕실|화장실|bath|wc/i.test(n)) {
+    if (fits(.6, 1.2)) { o += path(`M${X(r.x + .2)} ${Y(r.y + .2)}h${.4 * s}v${.2 * s}h${-.4 * s}z`, st) + `<ellipse cx="${f2(X(r.x + .4))}" cy="${f2(Y(r.y + .62))}" rx="${f2(.19 * s)}" ry="${f2(.25 * s)}" ${at(st)}/>`; o += R(r.x + r.w - .65, r.y + .15, .5, .4) + circ(X(r.x + r.w - .4), Y(r.y + .35), .12 * s, st); if (r.h > 2.2) o += R(r.x + .15, r.y + r.h - .95, Math.min(1.6, r.w - .3), .8); }
+  } else if (/서재|study|사무|office/i.test(n)) {
+    if (fits(1.4, 1.2)) o += R(cx - .7, r.y + .15, 1.4, .65) + circ(X(cx), Y(r.y + 1.15), .25 * s, st);
+  } else if (/드레스|dress|창고|stor/i.test(n)) {
+    if (r.w > .9) o += R(r.x + .1, r.y + .1, r.w - .2, .55, { strokeDasharray: '3 2' });
+  }
+  return o;
+}
+
+/* =========================================================
+   03  ELEVATION
+   ========================================================= */
+function windowRect(x, y, w, h, s) { // px coords, y top
+  const sh = Math.min(.14 * s, w * .2, h * .2);
+  return rect(x, y, w, h, { fill: '#dfe6e6', stroke: INK, strokeWidth: .9 }) +
+    poly([[x, y], [x + w, y], [x + w - 0, y + sh], [x + sh, y + sh], [x + sh, y + h], [x, y + h]], { fill: '#4b4842', fillOpacity: .45 }) +
+    line(x + w * .55, y + h * .25, x + w * .75, y + h * .08, { stroke: '#fff', strokeWidth: 1.2, strokeOpacity: .9 }) +
+    line(x + w * .62, y + h * .38, x + w * .9, y + h * .13, { stroke: '#fff', strokeWidth: .8, strokeOpacity: .9 });
+}
+function drawElev() {
+  const W = clamp(num('v-w'), 3, 200), n = clamp(Math.round(num('v-n')), 1, 40), gfh = clamp(num('v-gfh'), 2.4, 10), fh = clamp(num('v-fh'), 2.4, 10);
+  const bays = clamp(Math.round(num('v-bays')), 1, 30), ent = clamp(Math.round(num('v-ent')), 1, bays), ratio = num('v-ratio') / 100, wt = $('#v-win').value, roof = $('#v-roof').value;
+  const L = [0]; for (let k = 1; k <= n; k++) L.push(k === 1 ? gfh : L[k - 1] + fh);
+  const top = L[n], ridge = roof === 'gable' ? W * .5 * Math.tan(30 * Math.PI / 180) : roof === 'shed' ? W * .18 : 1.0;
+  const Ht = top + ridge;
+  const s = Math.min(780 / (W + 10), 480 / (Ht + 2)), gx = 500 - W * s / 2 + 10, gy = 570;
+  const X = x => gx + x * s, Y = z => gy - z * s, bw = W / bays;
+  let o = '';
+  // ground
+  o += rect(X(-6), gy, (W + 12) * s, 14, { fill: 'url(#h-earth)' });
+  // facade outline
+  let shape;
+  if (roof === 'gable') shape = [[0, 0], [W, 0], [W, top], [W / 2, top + ridge], [0, top]];
+  else if (roof === 'shed') shape = [[0, 0], [W, 0], [W, top + ridge], [0, top]];
+  else shape = [[0, 0], [W, 0], [W, top + ridge], [0, top + ridge]];
+  const sp = shape.map(([x, z]) => [X(x), Y(z)]);
+  o += poly(sp, { fill: `url(#e-${G.mat})`, stroke: 'none' });
+  if (roof === 'flat') o += rect(X(-.05), Y(top + ridge), (W + .1) * s, .12 * s, { fill: '#bdb7aa', stroke: INK, strokeWidth: .7 });
+  if (roof === 'gable') o += pline([[X(-.6), Y(top - .35)], [X(W / 2), Y(top + ridge + .1)], [X(W + .6), Y(top - .35)]], { fill: 'none', stroke: INK, strokeWidth: 3.2, strokeLinejoin: 'miter' });
+  if (roof === 'shed') o += line(X(-.6), Y(top - .12), X(W + .6), Y(top + ridge + .1), { stroke: INK, strokeWidth: 3.2 });
+  // windows
+  for (let k = 0; k < n; k++) {
+    const z0 = L[k], hf = L[k + 1] - L[k];
+    if (k === 0 && chk('v-gf')) {
+      for (let b = 0; b < bays; b++) {
+        const x = b * bw + .25, w = bw - .5, h = hf - .7;
+        if (b === ent - 1) {
+          const dw = Math.min(1.9, w), dx = b * bw + (bw - dw) / 2;
+          o += windowRect(X(b * bw + .25), Y(h + .1), w * s, (h - 2.5) * s, s);
+          o += rect(X(dx), Y(2.5), dw * s, 2.5 * s, { fill: '#c9d2d2', stroke: INK, strokeWidth: 1.1 }) + line(X(dx + dw / 2), Y(2.5), X(dx + dw / 2), gy, { stroke: INK, strokeWidth: .8 });
+          o += line(X(dx + dw / 2 - .15), Y(1.1), X(dx + dw / 2 - .15), Y(1.5), { stroke: INK, strokeWidth: 1.6 }) + line(X(dx + dw / 2 + .15), Y(1.1), X(dx + dw / 2 + .15), Y(1.5), { stroke: INK, strokeWidth: 1.6 });
+          o += rect(X(dx - .4), Y(2.85), (dw + .8) * s, .18 * s, { fill: INK });
+        } else o += windowRect(X(x), Y(h + .1), w * s, h * s, s) + line(X(x + w / 2), Y(h + .1), X(x + w / 2), Y(.1), { stroke: INK, strokeWidth: .6 });
+      }
+      continue;
+    }
+    if (wt === 'punched' || (k === 0)) {
+      for (let b = 0; b < bays; b++) {
+        if (k === 0 && b === ent - 1) { const dw = Math.min(1.2, bw * .7), dx = b * bw + (bw - dw) / 2; o += rect(X(dx), Y(2.3), dw * s, 2.3 * s, { fill: '#8a7d6b', stroke: INK, strokeWidth: 1 }); continue; }
+        const w = bw * ratio, h = Math.min(hf * .58, hf - 1.2), x = b * bw + (bw - w) / 2, sill = Math.min(.9, hf - h - .3);
+        o += windowRect(X(x), Y(z0 + sill + h), w * s, h * s, s);
+        if (w > 1.6) o += line(X(x + w / 2), Y(z0 + sill + h), X(x + w / 2), Y(z0 + sill), { stroke: INK, strokeWidth: .6 });
+        o += rect(X(x - .05), Y(z0 + sill), (w + .1) * s, .07 * s, { fill: INK });
+      }
+    } else if (wt === 'vertical') {
+      for (let b = 0; b < bays; b++) {
+        const w = Math.max(.4, bw * ratio * .45), h = hf - .9, x1 = b * bw + bw * .25 - w / 2, x2 = b * bw + bw * .75 - w / 2;
+        [x1, x2].forEach(x => o += windowRect(X(x), Y(z0 + .45 + h), w * s, h * s, s));
+      }
+    } else if (wt === 'ribbon') {
+      const h = clamp(hf * ratio * .75, .6, hf - .8), sill = (hf - h) * .55;
+      o += windowRect(X(.6), Y(z0 + sill + h), (W - 1.2) * s, h * s, s);
+      for (let x = .6 + bw / 2; x < W - .7; x += bw / 2) o += line(X(x), Y(z0 + sill + h), X(x), Y(z0 + sill), { stroke: INK, strokeWidth: .8 });
+    } else if (wt === 'curtain') {
+      o += windowRect(X(.3), Y(L[k + 1]), (W - .6) * s, hf * s, s);
+      o += rect(X(.3), Y(L[k + 1]), (W - .6) * s, (1 - ratio) * 1.2 * s, { fill: '#5d6365', fillOpacity: .55 });
+      for (let x = .3; x <= W - .3 + 1e-6; x += (W - .6) / (bays * 2)) o += line(X(x), Y(L[k + 1]), X(x), Y(z0), { stroke: INK, strokeWidth: 1 });
+      o += line(X(.3), Y(z0), X(W - .3), Y(z0), { stroke: INK, strokeWidth: 1.2 });
+    }
+  }
+  o += poly(sp, { fill: 'none', stroke: INK, strokeWidth: 1.8 });
+  // ground line
+  o += line(X(-6), gy, X(W + 6), gy, { stroke: INK, strokeWidth: 2.6 });
+  // trees + people
+  if (chk('v-tree')) { o += tree(X(-2.6), gy, 7.5 * s); o += tree(X(W + 2.8), gy, 6.2 * s); }
+  if (chk('v-ppl')) { [ent * bw - bw / 2 - 1.6, ent * bw - bw / 2 + 1.4, W * .15, W * .85].forEach((x, i) => o += person(X(x), gy, (i % 2 ? 1.65 : 1.78) * s, { op: .85 })); }
+  // levels + dims
+  if (chk('v-lvl')) {
+    const lx = X(W) + 34;
+    L.forEach((z, k) => o += line(X(W) + 4, Y(z), lx - 14, Y(z), { stroke: INK, strokeWidth: .35, strokeDasharray: '2 2' }) + levelMark(lx, Y(z), k === 0 ? 'GL' : k === n ? 'RF' : `${k + 1}FL`, (z ? '+' : '±') + mm(z)));
+    if (roof !== 'flat') o += levelMark(lx, Y(top + ridge), 'MAX', '+' + mm(top + ridge));
+    const dx1 = X(0) - 30, dx2 = X(0) - 54;
+    for (let k = 0; k < n; k++) o += dimV(Y(L[k + 1]), Y(L[k]), dx1, mm(L[k + 1] - L[k]));
+    o += dimV(Y(top + ridge), Y(0), dx2, mm(top + ridge));
+    for (let b = 0; b < bays; b++) o += dimH(X(b * bw), X((b + 1) * bw), gy + 36, mm(bw));
+    o += dimH(X(0), X(W), gy + 54, mm(W));
+  }
+  o += text(48, 50, 'ELEVATION', { fontSize: 9, fontFamily: MONO, fill: GRAY, letterSpacing: '.1em' }) + text(48, 70, `정면도 · ${MAT_KO[G.mat]}`, { fontSize: 15, fontWeight: 700 });
+  o += frame('입면도 (정면)', scaleTxt(s), 'A-201');
+  const winEn = { punched: `punched windows, ${bays} per floor, ${Math.round(ratio * 100)}% of bay width`, ribbon: 'continuous horizontal ribbon windows with slim mullions', curtain: 'full-height glass curtain wall with dark spandrel bands at each slab', vertical: 'tall narrow vertical slit windows in pairs' }[wt];
+  const roofEn = { flat: 'flat roof with a thin parapet coping', gable: 'steep 30° gable roof', shed: 'single-pitch shed roof' }[roof];
+  return {
+    title: '입면도', meta: `${W}m · ${n}F · H ${f2(top + ridge)}m`, svg: svgWrap(o),
+    prompt: {
+      type: 'architectural front elevation',
+      parts: [
+        ['도면 유형', `orthographic front elevation of a ${n}-story ${USE_EN[G.use]} ${CTX_EN[G.context]}, perfectly flat frontal view, no perspective`],
+        ['비례', `${W} m wide, ${bays} structural bays, ground floor ${gfh} m and upper floors ${fh} m high, total height ${f2(top + ridge)} m`],
+        ['재료', `facade in ${MAT_EN[G.mat]}`],
+        ['개구부', (chk('v-gf') ? 'fully glazed ground-floor storefront with the main entrance in bay ' + ent + ', ' : '') + winEn],
+        ['지붕', roofEn],
+        ['점경', [chk('v-ppl') ? 'scale figures' : '', chk('v-tree') ? 'two trees' : '', chk('v-lvl') ? 'level markers and dimension chains' : ''].filter(Boolean).join(', ') || 'no entourage'],
+      ],
+      neg: ['perspective', 'vanishing point', 'tilted camera', 'asymmetric windows', 'extra floors', 'random balconies'],
+      ko: `${n}층·${bays}베이 입면의 층고, 개구 방식, 재료를 수치로 고정했습니다. 재료만 바꿔(왼쪽 '주 재료') 같은 입면의 대안을 빠르게 비교하세요.`,
+    }
+  };
+}
+
+/* =========================================================
+   04  SECTION / SECTION PERSPECTIVE
+   ========================================================= */
+function drawSection() {
+  const mode = segVal('s-mode');
+  const W = clamp(num('s-w'), 4, 200), n = clamp(Math.round(num('s-n')), 1, 30), gfh = clamp(num('s-gfh'), 2.4, 10), fh = clamp(num('s-fh'), 2.4, 10);
+  const b = clamp(Math.round(num('s-b')), 0, 6), sl = clamp(num('s-slab'), 120, 800) / 1000, roof = $('#s-roof').value, t = .3, bh = 3.6;
+  const names = $('#s-rooms').value.split('\n').map(x => x.trim());
+  // levels: index from -b..n
+  const lv = []; for (let k = -b; k <= n; k++) lv.push(k <= 0 ? k * bh : (k === 1 ? gfh : gfh + (k - 1) * fh));
+  const lev = k => lv[k + b], top = lev(n), ridge = roof === 'gable' ? W * .5 * Math.tan(28 * Math.PI / 180) : 1.0, bot = lev(-b) - .6;
+  const s = Math.min(760 / (W + 12), 480 / (top + ridge - bot + 2)), gx = 500 - W * s / 2 + 10, gy = 100 + (top + ridge + .8) * s;
+  const X = x => gx + x * s, Y = z => gy - z * s;
+  const voidOn = chk('s-void') && n >= 2, xv = W * .38, stairOn = chk('s-stair') && mode === 'section', xs1 = W * .6, xs2 = Math.min(W - t - .3, W * .6 + Math.max(3.2, W * .26));
+  let o = '';
+  // earth
+  o += rect(X(-6), Y(0), (W + 12) * s, (-(bot - 1.2)) * s, { fill: 'url(#h-earth)' });
+  o += rect(X(0), Y(0), W * s, (-(bot)) * s, { fill: PAPER });
+  // perspective interior
+  if (mode === 'persp') {
+    const D = num('s-depth'), d0 = 10, k = d0 / (d0 + D), km = d0 / (d0 + D / 2);
+    const eyeLvl = parseInt($('#s-eye').value || '1', 10), vz = lev(clamp(eyeLvl - 1, -b, n - 1)) + 1.6, vx = W * num('s-vpx') / 100;
+    const VP = [X(vx), Y(vz)], pb = (p, kk = k) => [VP[0] + (p[0] - VP[0]) * kk, VP[1] + (p[1] - VP[1]) * kk];
+    const rooms = [];
+    for (let f = -b; f < n; f++) {
+      const z1 = lev(f), z2 = lev(f + 1) - sl;
+      if (voidOn && f === 1) continue;
+      if (voidOn && f === 0 && n >= 2) { rooms.push({ x1: t, x2: xv, z1, z2: lev(2) - sl, f, label: 'void' }); rooms.push({ x1: xv, x2: W - t, z1, z2, f }); continue; }
+      rooms.push({ x1: t, x2: W - t, z1, z2, f });
+    }
+    if (voidOn) { rooms.push({ x1: xv + .2, x2: W - t, z1: lev(1), z2: lev(2) - sl, f: 1 }); }
+    rooms.forEach((r, i) => {
+      const A = [X(r.x1), Y(r.z2)], Bq = [X(r.x2), Y(r.z2)], Cq = [X(r.x2), Y(r.z1)], Dq = [X(r.x1), Y(r.z1)];
+      const a = pb(A), bb = pb(Bq), c = pb(Cq), d = pb(Dq);
+      o += `<clipPath id="sp${i}"><rect x="${f2(A[0])}" y="${f2(A[1])}" width="${f2(Bq[0] - A[0])}" height="${f2(Dq[1] - A[1])}"/></clipPath><g clip-path="url(#sp${i})">`;
+      o += poly([A, Bq, bb, a], { fill: '#faf8f3', stroke: GRAY, strokeWidth: .5 }); // ceiling
+      o += poly([Dq, Cq, c, d], { fill: '#e7e1d4', stroke: GRAY, strokeWidth: .5 }); // floor
+      o += poly([A, a, d, Dq], { fill: '#efeae0', stroke: GRAY, strokeWidth: .5 }); // left
+      o += poly([Bq, bb, c, Cq], { fill: '#ebe5d9', stroke: GRAY, strokeWidth: .5 }); // right
+      // floor planks
+      const nb = Math.max(4, Math.round((r.x2 - r.x1) / 1.2));
+      for (let j = 1; j < nb; j++) { const fx = Dq[0] + (Cq[0] - Dq[0]) * j / nb; o += line(fx, Dq[1], ...pb([fx, Dq[1]]), { stroke: '#cfc7b6', strokeWidth: .5 }); }
+      for (let j = 1; j < 4; j++) { const kk = 1 - (1 - k) * j / 4; const p1 = pb(Dq, kk), p2 = pb(Cq, kk); o += line(...p1, ...p2, { stroke: '#d6cfbf', strokeWidth: .4 }); }
+      // back wall
+      o += poly([a, bb, c, d], { fill: '#f3efe6', stroke: GRAY, strokeWidth: .7 });
+      if (r.z1 >= 0) {
+        const ww = (r.x2 - r.x1) * .45, wx = r.x1 + (r.x2 - r.x1 - ww) / 2, wz1 = r.z1 + .9, wz2 = Math.min(r.z2 - .3, r.z1 + .9 + Math.min(2.2, (r.z2 - r.z1) - 1.3));
+        const q = [[X(wx), Y(wz2)], [X(wx + ww), Y(wz2)], [X(wx + ww), Y(wz1)], [X(wx), Y(wz1)]].map(p => pb(p));
+        o += poly(q, { fill: '#dce5e6', stroke: INK, strokeWidth: .7 });
+        o += line((q[0][0] + q[1][0]) / 2, q[0][1], (q[0][0] + q[1][0]) / 2, q[2][1], { stroke: INK, strokeWidth: .5 });
+      } else {
+        const q = [[X(r.x1 + 1), Y(r.z1 + 2.1)], [X(r.x1 + 3.4), Y(r.z1 + 2.1)], [X(r.x1 + 3.4), Y(r.z1)], [X(r.x1 + 1), Y(r.z1)]].map(p => pb(p));
+        o += poly(q, { fill: 'none', stroke: GRAY, strokeWidth: .6 }) + line((q[0][0] + q[1][0]) / 2, q[0][1], (q[0][0] + q[1][0]) / 2, q[2][1], { stroke: GRAY, strokeWidth: .5 });
+      }
+      // people at mid-depth
+      if (chk('s-ppl')) {
+        const fx = X(r.x1 + (r.x2 - r.x1) * .35), fp = pb([fx, Y(r.z1)], km);
+        o += person(fp[0], fp[1], 1.72 * s * km, { op: .7 });
+      }
+      o += '</g>';
+      // depth edges outside? (front opening lines)
+    });
+    o += circ(VP[0], VP[1], 2.5, { fill: ACC }) + text(VP[0] + 6, VP[1] - 5, 'VP', { fontSize: 8.5, fontFamily: MONO, fill: ACC });
+  } else {
+    // beyond elements (section mode): back wall windows
+    for (let f = Math.max(0, -b); f < n; f++) {
+      if (f < 0) continue;
+      const z1 = lev(f), z2 = lev(f + 1) - sl;
+      for (let x = t + 1.2; x < W - t - 2; x += 3.4) {
+        if (stairOn && x + 1.8 > xs1 && x < xs2) continue;
+        o += rect(X(x), Y(Math.min(z2 - .3, z1 + 2.6)), 1.8 * s, (Math.min(z2 - .3, z1 + 2.6) - z1 - .9) * s, { fill: 'none', stroke: LIGHT, strokeWidth: .8 });
+      }
+    }
+  }
+  // poché: walls with openings above grade
+  const P = { fill: INK };
+  const wallSeg = (x, z1, z2) => o += rect(X(x), Y(z2), t * s, (z2 - z1) * s, P);
+  [0, W - t].forEach(x => {
+    wallSeg(x, bot + .6, 0);
+    for (let f = 0; f < n; f++) {
+      const z1 = lev(f), z2 = lev(f + 1), sill = z1 + .9, head = z2 - sl - .4;
+      if (head - sill > .6) {
+        wallSeg(x, z1, sill); wallSeg(x, head, z2);
+        o += rect(X(x), Y(head), t * s, (head - sill) * s, { fill: '#fff', stroke: INK, strokeWidth: .5 });
+        o += line(X(x + t / 2), Y(head), X(x + t / 2), Y(sill), { stroke: INK, strokeWidth: .9 });
+      } else wallSeg(x, z1, z2);
+    }
+    if (roof === 'flat') wallSeg(x, top, top + ridge);
+  });
+  // slabs
+  const slab = (x1, x2, z) => o += rect(X(x1), Y(z), (x2 - x1) * s, sl * s, P);
+  for (let f = -b + 1; f <= n; f++) {
+    const z = lev(f); if (f === n && roof === 'gable') { slab(0, W, z); continue; }
+    let segs = [[0, W]];
+    if (voidOn && f === 1) segs = [[xv, W]];
+    if (stairOn && f > -b && f <= n - 1) segs = segs.flatMap(([a, c]) => { const r = []; if (xs1 > a) r.push([a, Math.min(c, xs1)]); if (xs2 < c) r.push([Math.max(a, xs2), c]); return r; });
+    segs.forEach(([a, c]) => slab(a, c, z));
+    if (voidOn && f === 1) o += line(X(xv), Y(z), X(xv), Y(z + 1.1), { stroke: INK, strokeWidth: 1 }) + line(X(xv - .1), Y(z + 1.1), X(xv + 1.2), Y(z + 1.1), { stroke: INK, strokeWidth: 1.2 });
+  }
+  if (b === 0) slab(0, W, 0);
+  // foundation
+  o += rect(X(-.5), Y(lev(-b)), (W + 1) * s, (.6) * s, P);
+  // roof
+  if (roof === 'gable') {
+    const th = .3 / Math.cos(28 * Math.PI / 180);
+    o += poly([[X(-.6), Y(top - .32)], [X(W / 2), Y(top + ridge)], [X(W + .6), Y(top - .32)], [X(W + .6), Y(top - .32 - th)], [X(W / 2), Y(top + ridge - th)], [X(-.6), Y(top - .32 - th)]], P);
+    wallSeg(0, top, top); // noop for symmetry
+  } else {
+    o += rect(X(-.05), Y(top + ridge + .05), (t + .1) * s, .08 * s, P) + rect(X(W - t - .05), Y(top + ridge + .05), (t + .1) * s, .08 * s, P);
+  }
+  // stairs (cut)
+  if (stairOn) for (let f = -b; f < n - 1; f++) {
+    const z1 = lev(f), z2 = lev(f + 1), hgt = z2 - z1, nr = Math.max(6, Math.round(hgt / .175)), run = (xs2 - xs1) / nr, rise = hgt / nr, dir = (f + b) % 2 === 0 ? 1 : -1;
+    const x0 = dir > 0 ? xs1 : xs2, pts = [[x0, z1]];
+    for (let i = 0; i < nr; i++) { const cx = x0 + dir * run * i; pts.push([cx, z1 + rise * (i + 1)], [cx + dir * run, z1 + rise * (i + 1)]); }
+    const end = x0 + dir * run * nr;
+    pts.push([end, z2 - .28], [x0 + dir * run, z1 - .0]);
+    o += poly(pts.map(([x, z]) => [X(x), Y(z)]), P);
+    o += line(X(x0 + dir * run * .5), Y(z1 + .9), X(end - dir * run * .5), Y(z2 + .9), { stroke: INK, strokeWidth: .8 });
+  }
+  // ground line
+  o += line(X(-6), Y(0), X(0), Y(0), { stroke: INK, strokeWidth: 2.4 }) + line(X(W), Y(0), X(W + 6), Y(0), { stroke: INK, strokeWidth: 2.4 });
+  // room labels + people (section mode)
+  for (let f = -b; f < n; f++) {
+    const nm = names[f + b] || (f < 0 ? `B${-f}` : `${f + 1}F`), z1 = lev(f), z2 = lev(f + 1);
+    if (voidOn && f === 1) { o += text(X((xv + W) / 2), Y(z1 + (z2 - z1) * .55), nm, { fontSize: 12.5, fontWeight: 700, textAnchor: 'middle', stroke: PAPER, strokeWidth: 3, paintOrder: 'stroke' }); continue; }
+    const cxl = stairOn ? X(xs1 / 2 + (voidOn && f === 0 ? xv / 2 : 0)) : X(W / 2);
+    o += text(cxl, Y(z1 + (z2 - z1) * .55), nm, { fontSize: 12.5, fontWeight: 700, textAnchor: 'middle', stroke: PAPER, strokeWidth: 3, paintOrder: 'stroke' });
+    if (chk('s-ppl')) o += person(cxl + (f % 2 ? 40 : -48), Y(z1), 1.75 * s, { fill: INK, op: .75 });
+  }
+  if (voidOn) o += text(X(xv / 2), Y(lev(1) + 1.6), 'VOID', { fontSize: 10, fontFamily: MONO, fill: ACC, textAnchor: 'middle', fontWeight: 600 });
+  // levels / dims
+  const lx = X(W) + 34;
+  for (let f = -b; f <= n; f++) { const z = lev(f); o += line(X(W) + 4, Y(z), lx - 14, Y(z), { stroke: INK, strokeWidth: .35, strokeDasharray: '2 2' }) + levelMark(lx, Y(z), f === n ? 'RF' : f < 0 ? `B${-f}` : `${f + 1}FL`, (z > 0 ? '+' : z < 0 ? '−' : '±') + mm(Math.abs(z))); }
+  const dx1 = X(0) - 34;
+  for (let f = -b; f < n; f++) o += dimV(Y(lev(f + 1)), Y(lev(f)), dx1, mm(lev(f + 1) - lev(f)));
+  o += dimV(Y(top), Y(0), dx1 - 24, mm(top));
+  o += text(48, 50, mode === 'persp' ? 'SECTION PERSPECTIVE' : 'SECTION', { fontSize: 9, fontFamily: MONO, fill: GRAY, letterSpacing: '.1em' }) + text(48, 70, mode === 'persp' ? 'A-A′ 단면투시도' : 'A-A′ 단면도', { fontSize: 15, fontWeight: 700 });
+  o += frame(mode === 'persp' ? '단면투시도' : '단면도', mode === 'persp' ? 'N.T.S.' : scaleTxt(s), 'A-301');
+  const persp = mode === 'persp';
+  return {
+    title: persp ? '단면투시도' : '단면도', meta: `${W}m · B${b}/${n}F · H ${f2(top)}m`, svg: svgWrap(o),
+    prompt: {
+      type: persp ? 'architectural section perspective' : 'architectural building section',
+      parts: [
+        ['도면 유형', persp ? `architectural section perspective of a ${USE_EN[G.use]}: an orthographic section cut in the foreground with one-point perspective interiors receding to a single vanishing point at eye level` : `architectural building section of a ${USE_EN[G.use]}, orthographic cut through the full height`],
+        ['층 구성', `${n} floors above ground${b ? ` and ${b} basement level${b > 1 ? 's' : ''}` : ''}, ground floor ${gfh} m, typical floor ${fh} m, ${roof === 'gable' ? 'gable roof' : 'flat roof with parapet'}`],
+        ['공간', names.slice(0, n + b).filter(Boolean).map((nm, i) => `${i - b < 0 ? 'B' + (b - i) : (i - b + 1) + 'F'} ${nm}`).join(', ') + (voidOn ? ', double-height void beside the lobby' : '') + (stairOn ? ', switchback stair' : '')],
+        ['절단 표현', 'cut slabs, walls and foundation in solid black poché, earth hatch below grade, ground line, level markers'],
+        persp ? ['투시 내부', 'warm interior surfaces, floor boards converging to the vanishing point, back-wall windows, people at mid depth, soft interior light'] : ['입면 너머', 'elements beyond the cut drawn in light gray thin lines'],
+        ['맥락', CTX_EN[G.context]],
+      ],
+      neg: persp ? ['two-point perspective', 'multiple vanishing points', 'fisheye', 'cut face in color', 'missing slabs'] : ['perspective', 'cut walls not filled', 'floating floors'],
+      ko: persp ? '절단면은 평면(정사영), 내부는 1점 투시로 분리 지시합니다. 소실점 위치·눈높이가 PNG와 같도록 참조 이미지 첨부를 권장합니다.' : '절단 부재 포셰, 지반 해치, 층고·레벨을 수치로 고정한 단면 프롬프트입니다.',
+    }
+  };
+}
+
+/* =========================================================
+   05  DETAIL
+   ========================================================= */
+const PRESETS = {
+  wallEx: { ko: '외벽 · RC 외단열 + 석재', orient: 'wall', en: 'exterior wall, reinforced concrete with external insulation and ventilated stone cladding', layers: '화강석 판재 | 30 | stone | 2.8\n통기 공기층 | 40 | air |\n압출법 보온판 | 150 | insul | 0.027\n철근콘크리트 벽 | 200 | conc | 2.3\n석고보드 2겹 | 19 | gyp | 0.18' },
+  wallBrick: { ko: '외벽 · 조적 중공벽', orient: 'wall', en: 'masonry cavity wall', layers: '치장 벽돌 | 90 | brick | 0.6\n공기층 | 50 | air |\n비드법 보온판 | 125 | insul | 0.034\n시멘트 벽돌 | 190 | brick | 0.6\n시멘트 미장 | 18 | mortar | 1.4' },
+  wallTimber: { ko: '외벽 · 목조 경골 벽체', orient: 'wall', en: 'light timber-frame wall with rainscreen', layers: '목재 사이딩 | 18 | wood | 0.13\n레인스크린 통기층 | 19 | air |\n투습방수지 | 1 | membrane | 0.2\nOSB 합판 | 11 | wood | 0.13\n스터드 + 글라스울 | 140 | insul | 0.04\n석고보드 | 12.5 | gyp | 0.18' },
+  roof: { ko: '지붕 · 평지붕 외단열', orient: 'roof', en: 'flat roof with external insulation and gravel ballast', layers: '보호 자갈 | 50 | gravel | 2.0\n압출법 보온판 | 220 | insul | 0.027\n복합 방수시트 | 5 | membrane | 0.2\n구배 몰탈 | 50 | mortar | 1.4\n철근콘크리트 슬래브 | 210 | conc | 2.3\n천장 공기층 | 150 | air |\n석고보드 천장 | 9.5 | gyp | 0.18' },
+  floor: { ko: '바닥 · 온돌 바닥', orient: 'roof', en: 'Korean ondol heated floor build-up on a concrete slab', layers: '강마루 | 12 | wood | 0.15\n방바닥 몰탈 (온수배관) | 45 | mortar | 1.4\n경량기포 콘크리트 | 40 | conc | 0.16\n차음 완충재 | 30 | insul | 0.04\n철근콘크리트 슬래브 | 210 | conc | 2.3' },
+};
+const MAT_COL = { conc: '#cfcac0', insul: '#ecd27a', brick: '#c9876a', wood: '#cfa877', gyp: '#efebe2', mortar: '#bdb6a8', stone: '#a9a59c', steel: '#7d8790', membrane: '#2a2722', air: '#ffffff', gravel: '#9d978b', glass: '#cfe0e3', earth: '#a8987c' };
+const HATCH_EN = { conc: 'concrete', insul: 'rigid insulation', brick: 'brick', wood: 'timber', gyp: 'gypsum board', mortar: 'cement mortar', stone: 'stone', steel: 'steel', membrane: 'waterproof membrane', air: 'air gap', gravel: 'gravel', glass: 'glass', earth: 'compacted earth' };
+const MAT_DICT = [[/화강석/, 'granite panel'], [/석재/, 'stone panel'], [/압출법/, 'XPS insulation'], [/비드법/, 'EPS insulation'], [/글라스울|유리면/, 'glass wool'], [/철근콘크리트|RC/, 'reinforced concrete'], [/석고/, 'gypsum board'], [/치장 ?벽돌/, 'face brick'], [/시멘트 ?벽돌/, 'cement brick'], [/미장|몰탈/, 'cement mortar'], [/사이딩/, 'timber siding'], [/통기|레인스크린/, 'ventilated cavity'], [/투습방수/, 'breather membrane'], [/방수/, 'waterproofing membrane'], [/OSB|합판/, 'OSB sheathing'], [/스터드/, 'timber studs'], [/자갈/, 'gravel ballast'], [/마루/, 'engineered wood flooring'], [/경량기포/, 'lightweight foamed concrete'], [/차음|완충/, 'acoustic resilient layer'], [/공기층/, 'air gap']];
+const matEn = (name, h) => { for (const [r, e] of MAT_DICT) if (r.test(name)) return e; return HATCH_EN[h] || name; };
+function parseLayers() {
+  return $('#d-layers').value.split('\n').map(l => l.split('|').map(s => s.trim())).filter(a => a[0] && parseFloat(a[1]) > 0)
+    .map(a => ({ name: a[0], t: parseFloat(a[1]), h: MAT_COL[a[2]] ? a[2] : 'conc', k: parseFloat(a[3]) }));
+}
+function thermal(Ls, orient) {
+  const rsi = orient === 'wall' ? .11 : .086, rse = .043;
+  const R = Ls.map(l => l.h === 'air' || !(l.k > 0) ? (l.h === 'air' ? .15 : 0) : l.t / 1000 / l.k);
+  const tot = rsi + rse + R.reduce((s, r) => s + r, 0);
+  return { R, rsi, rse, tot, U: 1 / tot };
+}
+function drawDetail() {
+  const pk = $('#d-preset').value, pr = PRESETS[pk] || PRESETS.wallEx, orient = pr.orient, mode = segVal('d-mode');
+  const Ls = parseLayers(); if (!Ls.length) Ls.push({ name: '레이어', t: 100, h: 'conc', k: 2 });
+  const T = Ls.reduce((s, l) => s + l.t, 0), th = thermal(Ls, orient), To = num('d-to'), Ti = num('d-ti');
+  // temperatures at interfaces
+  const temps = []; { let acc = th.rse; temps.push(To + (Ti - To) * acc / th.tot); Ls.forEach((l, i) => { acc += th.R[i]; temps.push(To + (Ti - To) * acc / th.tot); }); }
+  let o = '';
+  const callX = 690;
+  if (mode === 'draw') {
+    const isWall = orient === 'wall';
+    const tLen = isWall ? 430 : 360, aLen = isWall ? 430 : 520;
+    const sc = Math.min(tLen / T, 4), t0 = isWall ? 150 : 110, a0 = isWall ? 110 : 90;
+    // map (thickness px, along px) -> screen
+    const M = (tp, ap) => isWall ? [t0 + tp, a0 + ap] : [a0 + ap, t0 + tp];
+    const R2 = (tp1, tp2, ap1, ap2, op) => { const p = M(tp1, ap1), q = M(tp2, ap2); return rect(p[0], p[1], q[0] - p[0], q[1] - p[1], op); };
+    let acc = 0; const mids = [];
+    Ls.forEach((l, i) => {
+      const w = l.t * sc;
+      o += R2(acc, acc + w, 0, aLen, { fill: `url(#h-${l.h})`, stroke: INK, strokeWidth: l.h === 'membrane' ? 1.4 : .7 });
+      if (l.h === 'air') o += R2(acc, acc + w, 0, aLen, { fill: 'none', stroke: INK, strokeWidth: .7, strokeDasharray: '4 3' });
+      mids.push(acc + w / 2); acc += w;
+    });
+    // break lines
+    const brk = ap => { const pts = []; const k = 9; for (let i = 0; i <= k; i++) pts.push(M(-14 + (acc + 28) * i / k, ap + (i % 2 ? -5 : 5) * (i > 0 && i < k ? 1 : 0))); return pline(pts, { fill: 'none', stroke: INK, strokeWidth: 1 }); };
+    o += (isWall ? R2(-16, acc + 16, -10, 8, { fill: PAPER }) + R2(-16, acc + 16, aLen - 8, aLen + 10, { fill: PAPER }) : R2(-6, acc + 6, -12, 8, { fill: PAPER }) + R2(-6, acc + 6, aLen - 8, aLen + 12, { fill: PAPER })) + brk(0) + brk(aLen);
+    // side labels
+    const pOut = M(-12, isWall ? -24 : aLen * .5), pIn = M(acc + 12, isWall ? -24 : aLen * .5);
+    if (isWall) { o += text(t0, a0 - 30, `EXT. 외부  ${To}℃`, { fontSize: 11, fontWeight: 700, textAnchor: 'start', fill: '#3f5c6e' }); o += text(t0 + acc, a0 - 30, `INT. 실내  ${Ti}℃`, { fontSize: 11, fontWeight: 700, textAnchor: 'end', fill: ACC }); }
+    else { o += text(a0, t0 - 16, `EXT. 외부  ${To}℃`, { fontSize: 11, fontWeight: 700, fill: '#3f5c6e' }); o += text(a0, t0 + acc + 24, `INT. 실내  ${Ti}℃`, { fontSize: 11, fontWeight: 700, fill: ACC }); }
+    // temperature gradient
+    if (chk('d-temp')) {
+      const tmin = Math.min(To, Ti), tmax = Math.max(To, Ti), span = (tmax - tmin) || 1;
+      const ap = v => (isWall ? 40 : 30) + (tmax - v) / span * (aLen - (isWall ? 80 : 60)) * (isWall ? 1 : .55);
+      let tp = 0; const pts = [M(-10, ap(To)), M(0, ap(temps[0]))];
+      Ls.forEach((l, i) => { tp += l.t * sc; pts.push(M(tp, ap(temps[i + 1]))); });
+      pts.push(M(acc + 10, ap(Ti)));
+      o += pline(pts, { fill: 'none', stroke: ACC, strokeWidth: 1.8 });
+      pts.slice(1, -1).forEach((p, i) => { o += circ(p[0], p[1], 2.4, { fill: ACC }); });
+      if (!isWall) { } // labels kept minimal
+      const mid = Ls.findIndex(l => l.h === 'insul');
+      if (mid >= 0) { const p = pts[mid + 2]; o += text(p[0] + 6, p[1] + (isWall ? 14 : -6), `${temps[mid + 1].toFixed(1)}℃`, { fontSize: 9.5, fontFamily: MONO, fill: ACC }); }
+    }
+    // callouts
+    const n = Ls.length, top = 100, bottom = 500;
+    const cy = Ls.map((l, i) => n === 1 ? (top + bottom) / 2 : top + (bottom - top) * i / (n - 1));
+    Ls.forEach((l, i) => {
+      const anchor = isWall ? M(mids[i], 40 + (aLen - 80) * (i + .5) / n) : M(mids[i], aLen * (.25 + .5 * (i + .5) / n));
+      const ex = callX - 18;
+      o += circ(anchor[0], anchor[1], 2.2, { fill: INK }) + pline([anchor, [isWall ? anchor[0] + 0 : anchor[0], isWall ? anchor[1] : anchor[1]], [ex - 30, cy[i]], [ex, cy[i]]], { fill: 'none', stroke: INK, strokeWidth: .6 });
+      o += circ(callX, cy[i], 10, { fill: PAPER, stroke: INK, strokeWidth: 1 }) + text(callX, cy[i] + 4, i + 1, { fontSize: 10.5, fontFamily: MONO, fontWeight: 600, textAnchor: 'middle' });
+      o += text(callX + 18, cy[i] - 1, l.name, { fontSize: 12, fontWeight: 700 }) + text(callX + 18, cy[i] + 13, `T${l.t}${l.k > 0 ? `  λ ${l.k}` : ''}${th.R[i] ? `  R ${th.R[i].toFixed(2)}` : ''}`, { fontSize: 9.5, fontFamily: MONO, fill: GRAY });
+    });
+    // dims
+    if (chk('d-dim')) {
+      let a = 0;
+      if (isWall) { const y = a0 + aLen + 30; Ls.forEach(l => { const w = l.t * sc; if (w > 14) o += dimH(t0 + a, t0 + a + w, y, l.t); else o += line(t0 + a, y - 4, t0 + a, y + 4, { stroke: INK, strokeWidth: .6 }); a += w; }); o += dimH(t0, t0 + acc, y + 22, `${T}`); }
+      else { const x = a0 - 26; Ls.forEach(l => { const w = l.t * sc; if (w > 14) o += dimV(t0 + a, t0 + a + w, x, l.t); a += w; }); o += dimV(t0, t0 + acc, x - 22, `${T}`); }
+    }
+  } else {
+    // exploded axonometric
+    const sc = 230 / T, gap = 20, isWall = orient === 'wall';
+    const P = (x, y, z) => { const p = iso(x, y, z); return [380 + p[0], 360 + p[1]]; };
+    const Hh = 220, Dd = 230;
+    let pos = 0; const boxes = [];
+    Ls.forEach((l, i) => { const w = Math.max(5, l.t * sc); boxes.push({ l, a: pos, w, i }); pos += w + gap; });
+    const tot = pos - gap, shift = -tot / 2;
+    const order = boxes; // wall: increasing x (outside first, farthest); roof: from bottom
+    const drawOrder = isWall ? order : [...order].reverse();
+    const lab = [];
+    drawOrder.forEach(({ l, a, w, i }) => {
+      let x1, x2, y1, y2, z1, z2;
+      if (isWall) { x1 = a + shift - 40; x2 = x1 + w; y1 = -Dd / 2; y2 = Dd / 2; z1 = -Hh / 2 + 60; z2 = Hh / 2 + 60; }
+      else { const zt = tot / 2 - a; z2 = zt + 40; z1 = z2 - w; x1 = -Dd / 2 + 10; x2 = Dd / 2 + 10; y1 = -Hh / 2 - 20; y2 = Hh / 2 - 20; }
+      const col = MAT_COL[l.h], dark = shade(col, -.18), darker = shade(col, -.32);
+      const st = { stroke: INK, strokeWidth: .7, strokeLinejoin: 'round' };
+      const dash = l.h === 'air' ? { strokeDasharray: '4 3', fillOpacity: .35 } : {};
+      o += poly([P(x2, y1, z1), P(x2, y2, z1), P(x2, y2, z2), P(x2, y1, z2)], { fill: dark, ...st, ...dash });
+      o += poly([P(x1, y2, z1), P(x2, y2, z1), P(x2, y2, z2), P(x1, y2, z2)], { fill: darker, ...st, ...dash });
+      o += poly([P(x1, y1, z2), P(x2, y1, z2), P(x2, y2, z2), P(x1, y2, z2)], { fill: col, ...st, ...dash });
+      const an = isWall ? P((x1 + x2) / 2, y1 + 40 + i * 22, z2) : P(x2, (y1 + y2) / 2 - 40, (z1 + z2) / 2);
+      lab.push({ an, i, l });
+    });
+    lab.sort((p, q) => p.i - q.i);
+    const n = lab.length, top = 70, bottom = 540;
+    lab.forEach(({ an, i, l }) => {
+      const y = n === 1 ? 320 : top + (bottom - top) * i / (n - 1);
+      o += circ(an[0], an[1], 2.4, { fill: INK }) + pline([an, [callX - 50, y], [callX - 16, y]], { fill: 'none', stroke: INK, strokeWidth: .6 });
+      o += circ(callX, y, 10, { fill: PAPER, stroke: INK }) + text(callX, y + 4, i + 1, { fontSize: 10.5, fontFamily: MONO, fontWeight: 600, textAnchor: 'middle' });
+      o += rect(callX + 18, y - 9, 10, 10, { fill: MAT_COL[l.h], stroke: INK, strokeWidth: .5 }) + text(callX + 34, y, l.name, { fontSize: 12, fontWeight: 700 }) + text(callX + 34, y + 14, `${l.t}mm · ${HATCH_EN[l.h]}`, { fontSize: 9.5, fontFamily: MONO, fill: GRAY });
+    });
+    o += text(60, 590, isWall ? '← 외부 EXT.' : '↑ 외부 EXT.', { fontSize: 10.5, fill: '#3f5c6e', fontWeight: 700 }) + text(60, 606, '레이어 두께는 가독성을 위해 비례 확대(최소 5px)', { fontSize: 9.5, fill: GRAY });
+  }
+  // U-value box
+  o += rect(690, 584, 270, 46, { fill: '#fff', stroke: INK, strokeWidth: .7 });
+  o += text(702, 600, 'U-VALUE (계산값 · 참고)', { fontSize: 8.5, fontFamily: MONO, fill: GRAY, letterSpacing: '.06em' });
+  o += text(702, 621, `${th.U.toFixed(3)} W/㎡K`, { fontSize: 16, fontWeight: 700, fontFamily: MONO });
+  o += text(950, 621, `총 ${T}mm`, { fontSize: 11, fontFamily: MONO, fill: GRAY, textAnchor: 'end' });
+  o += frame(mode === 'draw' ? `디테일 · ${pr.ko}` : `분해 다이어그램 · ${pr.ko}`, mode === 'draw' ? '1:10' : 'N.T.S.', 'A-501');
+  return {
+    title: mode === 'draw' ? '디테일 도면' : '디테일 분해 다이어그램', meta: `${pr.ko} · ${Ls.length} layers · U ${th.U.toFixed(3)}`, svg: svgWrap(o),
+    prompt: {
+      type: mode === 'draw' ? 'construction detail drawing' : 'exploded axonometric construction diagram',
+      parts: [
+        ['도면 유형', mode === 'draw' ? `architectural construction detail drawing at 1:10, ${orient === 'wall' ? 'horizontal wall section' : 'vertical build-up section'} of a ${pr.en}` : `exploded isometric diagram of a ${pr.en}, layers separated with equal gaps`],
+        ['레이어', (orient === 'wall' ? 'from exterior to interior: ' : 'from top to bottom: ') + Ls.map(l => `${matEn(l.name, l.h)} ${l.t}mm`).join(', ')],
+        ['표현', mode === 'draw' ? 'standard material hatching (concrete stipple, insulation wave, diagonal brick), break lines at both ends, numbered callout bubbles with leader lines' + (chk('d-dim') ? ', dimension chain' : '') + (chk('d-temp') ? `, red temperature gradient line from ${To}°C to ${Ti}°C` : '') : 'each layer a flat colored slab with material color, numbered leader labels on the right, clean white background'],
+        ['성능', `total thickness ${T} mm, calculated U-value ${th.U.toFixed(3)} W/m²K shown in a small box`],
+      ],
+      neg: mode === 'draw' ? ['perspective', 'wrong layer order', 'inconsistent hatch', 'cartoon'] : ['realistic photo', 'merged layers', 'wrong layer order'],
+      ko: `레이어 순서·두께·해치를 프롬프트에 고정했습니다. U값 ${th.U.toFixed(3)}은 단순 열저항 합산 참고치이며 법정 기준(지역·부위별)과 대조해 확인하세요.`,
+    }
+  };
+}
+function shade(hex, f) {
+  const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const t = f < 0 ? 0 : 255, p = Math.abs(f);
+  r = Math.round((t - r) * p + r); g = Math.round((t - g) * p + g); b = Math.round((t - b) * p + b);
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+/* =========================================================
+   PROMPT COMPOSER
+   ========================================================= */
+function compose(p) {
+  const st = STYLES[G.style];
+  const parts = [...p.parts, ['스타일', st.en], ['품질', 'high resolution, crisp details, clean white margins']];
+  const neg = [...p.neg, ...BASE_NEG].join(', ');
+  const core = parts.map(x => x[1]).join(', ');
+  const arMap = { '10:7': '10:7', '16:9': '16:9', '4:3': '4:3', '1:1': '1:1', '3:4': '3:4' };
+  let main, negOut = neg, extra = '';
+  if (G.engine === 'mj') {
+    main = `${core} --ar ${arMap[G.ar]} --style raw --v 7 --no ${p.neg.slice(0, 5).join(', ')}, text, watermark`;
+    negOut = null;
+    extra = G.ref ? '저장한 PNG를 이미지 프롬프트로 업로드해 맨 앞에 URL을 붙이고 --iw 1.5~2 를 추가하세요.\n형태 고정이 약하면 Editor(Retexture) 기능에 PNG를 올려 동일 프롬프트로 재질만 바꾸세요.' : '--chaos 10 으로 변주 폭을 조절하세요.';
+  } else if (G.engine === 'sd') {
+    main = `(${p.parts[0][1]}:1.3), ${parts.slice(1).map(x => x[1]).join(', ')}, masterpiece, best quality`;
+    extra = `Steps 30 · CFG 6~7 · Sampler DPM++ 2M Karras · ${G.ar} 비율 해상도` + (G.ref ? '\nControlNet: Lineart(또는 Canny / MLSD) · 저장한 PNG를 control image로 · weight 0.8~1.0 · ending step 0.8' : '');
+  } else {
+    const sent = parts.map(([k, v], i) => i === 0 ? `Create ${/^[aeiou]/i.test(v) ? 'an' : 'a'} ${v}.` : `${k === '스타일' ? 'Graphic style' : k === '품질' ? 'Output' : capitalize(engKey(k))}: ${v}.`).join(' ');
+    main = (G.ref ? 'Use the attached drawing as an exact geometric reference: keep the layout, proportions, openings and line positions unchanged and change only the graphic style and materials. ' : '') + sent + ` Aspect ratio ${G.ar}. Avoid: ${neg}.`;
+    negOut = null;
+    extra = G.ref ? '1) 저장한 PNG를 대화창에 첨부 → 2) 위 프롬프트 붙여넣기 → 3) "같은 형태로 스타일만 [수채화]로" 처럼 한 줄씩 수정 요청' : '';
+  }
+  return { parts, main, neg: negOut, extra };
+}
+const KEY_EN = { '도면 유형': 'drawing type', '단계': 'steps', '투상': 'projection', '표현': 'graphics', '맥락': 'context', '프로그램': 'programs', '관계': 'relationships', '구도': 'composition', '일조': 'sun', '바람': 'wind', '매스': 'massing', '외곽': 'footprint', '실 구성': 'rooms', '기호': 'symbols', '가구': 'furniture', '비례': 'proportions', '재료': 'materials', '개구부': 'openings', '지붕': 'roof', '점경': 'entourage', '층 구성': 'levels', '공간': 'spaces', '절단 표현': 'cut', '투시 내부': 'interior', '입면 너머': 'beyond', '레이어': 'layers', '성능': 'performance' };
+const engKey = k => KEY_EN[k] || k;
+const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* =========================================================
+   UI
+   ========================================================= */
+const TABS = [
+  { id: 'diagram', n: '01', ko: '다이어그램' },
+  { id: 'plan', n: '02', ko: '평면도' },
+  { id: 'elev', n: '03', ko: '입면도' },
+  { id: 'section', n: '04', ko: '단면 · 단면투시' },
+  { id: 'detail', n: '05', ko: '디테일 · 다이어그램화' },
+];
+let cur = 'diagram';
+try { const s = localStorage.getItem('arch-ai-tab'); if (TABS.some(t => t.id === s)) cur = s; } catch (e) { }
+const TOOLS = {
+  diagram: () => ({ mass: drawMass, bubble: drawBubble, env: drawEnv })[segVal('dg-type')](),
+  plan: drawPlan, elev: drawElev, section: drawSection, detail: drawDetail,
+};
+let last = null;
+function render() {
+  readGlobal();
+  try {
+    const r = TOOLS[cur]();
+    last = r;
+    $('#stage').innerHTML = r.svg;
+    $('#st-title').textContent = r.title; $('#st-meta').textContent = r.meta;
+    const c = compose(r.prompt);
+    $('#anat').innerHTML = c.parts.map(([k, v]) => `<span><b>${esc(k)}</b>${esc(v.length > 46 ? v.slice(0, 44) + '…' : v)}</span>`).join('');
+    $('#pr-main').textContent = c.main;
+    $('#neg-wrap').hidden = !c.neg; $('#pr-neg').textContent = c.neg || '';
+    $('#ex-wrap').hidden = !c.extra; $('#pr-extra').textContent = c.extra;
+    $('#pr-ko').textContent = r.prompt.ko;
+    $('#pr-meta').textContent = `${$('#g-engine').selectedOptions[0].text} · ${STYLES[G.style].ko}`;
+  } catch (err) { console.error(err); $('#stage').innerHTML = `<p style="padding:20px;line-height:1.5">입력값을 확인하세요: ${esc(err.message)}</p>`; }
+}
+function setTab(id) {
+  cur = id;
+  $$('#tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.id === id));
+  $$('.ctrl').forEach(c => c.hidden = c.dataset.tab !== id);
+  try { localStorage.setItem('arch-ai-tab', id); } catch (e) { }
+  render();
+}
+function initSeg(id, cb) {
+  $$(`#${id} button`).forEach(b => b.addEventListener('click', () => { $$(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); cb && cb(b.dataset.v); render(); }));
+}
+function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1600); }
+function download(name, blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+const fname = ext => `${(G.project || 'drawing').replace(/[^\w가-힣-]+/g, '_')}_${cur}.${ext}`;
+
+(function init() {
+  $('#tabs').innerHTML = TABS.map(t => `<button role="tab" data-id="${t.id}"><span>${t.n}</span>${t.ko}</button>`).join('');
+  $$('#tabs button').forEach(b => b.addEventListener('click', () => setTab(b.dataset.id)));
+  $('#g-style').innerHTML = Object.entries(STYLES).map(([k, v]) => `<option value="${k}">${v.ko}</option>`).join('');
+  const dirOpts = DIRS.map(d => `<option value="${d}">${DIR_KO[d]}풍 (${d})</option>`).join('');
+  $('#e-ws').innerHTML = dirOpts; $('#e-ww').innerHTML = dirOpts; $('#e-ws').value = 'SE'; $('#e-ww').value = 'NW';
+  $('#d-preset').innerHTML = Object.entries(PRESETS).map(([k, v]) => `<option value="${k}">${v.ko}</option>`).join('');
+  $('#d-layers').value = PRESETS.wallEx.layers;
+  $('#d-preset').addEventListener('change', () => { $('#d-layers').value = PRESETS[$('#d-preset').value].layers; render(); });
+  const fillEye = () => { const n = clamp(Math.round(num('s-n')), 1, 30), b = clamp(Math.round(num('s-b')), 0, 6), v = $('#s-eye').value || '1'; let h = ''; for (let k = -b + 1; k <= n; k++) h += `<option value="${k}">${k <= 0 ? 'B' + (1 - k) : k + 'F'}</option>`; $('#s-eye').innerHTML = h; $('#s-eye').value = $(`#s-eye option[value="${v}"]`) ? v : '1'; };
+  fillEye(); $('#s-n').addEventListener('input', fillEye); $('#s-b').addEventListener('input', fillEye);
+  initSeg('dg-type', v => $$('[data-dg]').forEach(el => el.hidden = el.dataset.dg !== v));
+  initSeg('s-mode', v => $$('[data-sp]').forEach(el => el.hidden = el.dataset.sp !== v));
+  initSeg('d-mode');
+  $$('.rng').forEach(r => { const i = $('input', r), out = $('output', r), suf = /ratio|vpx/.test(i.id) ? '%' : /rot/.test(i.id) ? '°' : ''; const u = () => out.textContent = i.value + suf; i.addEventListener('input', u); u(); });
+  document.addEventListener('input', e => { if (e.target.closest('aside')) render(); });
+  document.addEventListener('change', e => { if (e.target.closest('aside') && e.target.tagName === 'SELECT') render(); });
+  $('#p-shuffle').addEventListener('click', () => { const ta = $('#p-rooms'), ls = ta.value.split('\n').filter(l => l.trim()); for (let i = ls.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[ls[i], ls[j]] = [ls[j], ls[i]]; } ta.value = ls.join('\n'); render(); });
+  $$('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+    const t = $('#' + b.dataset.copy).textContent;
+    try { await navigator.clipboard.writeText(t); toast('복사했습니다'); } catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('복사했습니다'); }
+  }));
+  $('#dl-svg').addEventListener('click', () => last && download(fname('svg'), new Blob([last.svg], { type: 'image/svg+xml' })));
+  $('#dl-png').addEventListener('click', () => {
+    if (!last) return;
+    const img = new Image(), url = URL.createObjectURL(new Blob([last.svg], { type: 'image/svg+xml' }));
+    img.onload = () => { const c = document.createElement('canvas'); c.width = VW * 2; c.height = VH * 2; const x = c.getContext('2d'); x.fillStyle = PAPER; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); c.toBlob(b => { download(fname('png'), b); toast('PNG 저장 — AI 엔진에 첨부하세요'); }); };
+    img.src = url;
+  });
+  $$('#tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.id === cur));
+  $$('.ctrl').forEach(c => c.hidden = c.dataset.tab !== cur);
+  render();
+})();
+</script>
+</body>
+</html>
