@@ -44,9 +44,10 @@
    같은 입력이면 같은 도면이 나온다(시드 고정 난수). 변주는 '수목 변주', '재질 변주' 숫자로만 바꾼다.
 
 ## 공개 위치
-- **목표:** 실제 도메인 `www.mmggdesignlab.com/architecture-ai/`
-- **현재:** `mmggdesignlab.vercel.app/architecture-ai/` (`allenlee` 저장소)
-- **주의:** 실제 도메인은 `mmgg-website` 저장소에서 배포된다. 그쪽으로 도구를 옮기거나 연결해야 한다.
+- **운영:** `www.mmggdesignlab.com/architecture-ai` — `mmgg-website` 저장소의 `architecture-ai/` 폴더. 사이트 왼쪽 메뉴 맨 아래 'AI 도면'.
+- **개발용 사본:** `mmggdesignlab.vercel.app/architecture-ai/` — `allenlee` 저장소.
+- 두 사본은 같은 파일 3개(`index.html`, `studio.js`, `render-ai.js`)다. 고치면 두 저장소에 같이 반영한다.
+- 실제 도메인은 끝에 `/`가 붙지 않는 주소(`trailingSlash: false`)라서 스크립트 경로는 반드시 `/architecture-ai/…` 절대 경로로 쓴다.
 
 ## 구조
 | 파일 | 역할 |
@@ -64,7 +65,7 @@
 ## 다음 작업 (우선순위 순)
 - [x] **AI 렌더 기본 서비스를 OpenAI로 변경** — 첫 방문 기본값 OpenAI, 키 발급 링크·조직 인증·비용 안내 추가
 - [ ] **02 평면도 품질 끌어올리기** — 실제 OpenAI 키로 렌더해 레퍼런스 3번과 비교, 지시문·도면 보강
-- [ ] 실제 도메인 `www.mmggdesignlab.com`에 공개 (`mmgg-website` 저장소로 이전)
+- [x] 실제 도메인 `www.mmggdesignlab.com/architecture-ai`에 공개 — `mmgg-website`로 이전, 메뉴 링크·사이트맵 추가
 - [ ] 04 단면투시 → 01 다이어그램 → 03·05 순서로 같은 품질 점검
 - [ ] 외부 공개 전 확인: 키 입력 안내 문구, 키 발급 링크, 렌더 1회 비용 안내
 - [ ] OpenAI 최신 이미지 모델명 확인 후 기본값 갱신 (현재 `gpt-image-1`)
