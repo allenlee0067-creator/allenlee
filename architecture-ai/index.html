@@ -74,7 +74,9 @@
   .btn.pri{background:var(--ink);color:var(--paper)}
   .btn.pri:hover{background:var(--ink-2)}
   #stage{background:#fff;padding:0;line-height:0}
-  #stage svg{width:100%;height:auto;display:block}
+  #stage{display:flex;justify-content:center;background:#fff}
+  #stage svg{width:100%;height:auto;display:block;max-height:88vh}
+  #stage svg.portrait{width:auto;max-width:100%}
 
   .anat{display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px 0}
   .anat span{font-size:11.5px;background:var(--white);border:1px solid var(--line);padding:3px 8px;border-radius:2px;color:var(--ink-2)}
@@ -144,7 +146,7 @@
         <label class="f"><b>주 재료</b>
           <select id="g-mat">
             <option value="conc">노출콘크리트</option>
-            <option value="brick">붉은 벽돌</option>
+            <option value="brick" selected>붉은 벽돌</option>
             <option value="wood">목재 루버·사이딩</option>
             <option value="metal">금속 패널</option>
             <option value="stone">석재</option>
@@ -195,6 +197,11 @@
             <label><input type="checkbox" value="shift" checked /> 상부 이동</label>
             <label><input type="checkbox" value="elevate" checked /> 필로티</label>
             <label><input type="checkbox" value="terrace" checked /> 계단식 테라스</label>
+          </div>
+          <div class="chk">
+            <label><input type="checkbox" id="m-ctx" checked /> 대지·도로</label>
+            <label><input type="checkbox" id="m-ppl" checked /> 사람·수목</label>
+            <label><input type="checkbox" id="m-glass" checked /> 유리 밴드</label>
           </div>
         </div>
         <div data-dg="bubble" class="body" style="padding:0" hidden>
@@ -257,7 +264,15 @@
           <label class="f"><b>외벽 (mm)</b><input type="number" id="p-to" value="300" step="10" /></label>
           <label class="f"><b>내벽 (mm)</b><input type="number" id="p-ti" value="150" step="10" /></label>
         </div>
+        <div class="row">
+          <label class="f"><b>대지 여유 (m)</b><input type="number" id="p-margin" value="7" min="2" max="30" /></label>
+          <label class="f"><b>수목 변주</b><input type="number" id="p-seed" value="7" min="1" max="999" /></label>
+        </div>
         <div class="chk">
+          <label><input type="checkbox" id="p-land" checked /> 조경·포장</label>
+          <label><input type="checkbox" id="p-shadow" checked /> 그림자</label>
+          <label><input type="checkbox" id="p-grid" checked /> 그리드 축</label>
+          <label><input type="checkbox" id="p-cut" checked /> 단면선</label>
           <label><input type="checkbox" id="p-furn" checked /> 가구</label>
           <label><input type="checkbox" id="p-dim" checked /> 치수</label>
           <label><input type="checkbox" id="p-north" checked /> 방위·스케일</label>
@@ -271,19 +286,20 @@
       <h2>입면도 설정</h2>
       <div class="body">
         <div class="row">
-          <label class="f"><b>입면 폭 (m)</b><input type="number" id="v-w" value="18" min="4" max="100" /></label>
-          <label class="f"><b>층수</b><input type="number" id="v-n" value="4" min="1" max="30" /></label>
+          <label class="f"><b>입면 폭 (m)</b><input type="number" id="v-w" value="9" min="4" max="100" /></label>
+          <label class="f"><b>층수</b><input type="number" id="v-n" value="5" min="1" max="30" /></label>
         </div>
         <div class="row">
-          <label class="f"><b>1층 층고</b><input type="number" id="v-gfh" value="4.5" step="0.1" /></label>
+          <label class="f"><b>1층 층고</b><input type="number" id="v-gfh" value="5.0" step="0.1" /></label>
           <label class="f"><b>기준층 층고</b><input type="number" id="v-fh" value="3.3" step="0.1" /></label>
         </div>
         <div class="row">
-          <label class="f"><b>베이 수</b><input type="number" id="v-bays" value="5" min="1" max="20" /></label>
-          <label class="f"><b>출입구 베이</b><input type="number" id="v-ent" value="3" min="1" max="20" /></label>
+          <label class="f"><b>베이 수</b><input type="number" id="v-bays" value="2" min="1" max="20" /></label>
+          <label class="f"><b>출입구 베이</b><input type="number" id="v-ent" value="2" min="1" max="20" /></label>
         </div>
         <label class="f"><b>창 유형</b>
           <select id="v-win">
+            <option value="french">프렌치 발코니 창</option>
             <option value="punched">펀치 창 (개별 창)</option>
             <option value="ribbon">수평 연속창</option>
             <option value="curtain">커튼월</option>
@@ -298,8 +314,21 @@
             <option value="shed">외쪽지붕</option>
           </select>
         </label>
+        <label class="f"><b>1층</b>
+          <select id="v-ground">
+            <option value="arch">아치 개구부</option>
+            <option value="shop">상점 전면 유리</option>
+            <option value="plain">일반 창</option>
+          </select>
+        </label>
+        <div class="row">
+          <label class="f"><b>재질 변주</b><input type="number" id="v-seed" value="3" min="1" max="999" /></label>
+          <label class="f"><b>단면 스트립 깊이 (m)</b><input type="number" id="v-sd" value="4.5" step="0.5" min="2" max="10" /></label>
+        </div>
         <div class="chk">
-          <label><input type="checkbox" id="v-gf" checked /> 1층 전면 유리</label>
+          <label><input type="checkbox" id="v-sec" checked /> 단면 스트립</label>
+          <label><input type="checkbox" id="v-band" checked /> 층 밴드</label>
+          <label><input type="checkbox" id="v-curtain" checked /> 커튼</label>
           <label><input type="checkbox" id="v-ppl" checked /> 사람</label>
           <label><input type="checkbox" id="v-tree" checked /> 수목</label>
           <label><input type="checkbox" id="v-lvl" checked /> 레벨·치수</label>
@@ -312,37 +341,50 @@
       <h2>단면 · 단면투시 설정</h2>
       <div class="body">
         <div class="seg" id="s-mode">
-          <button data-v="section" class="on">단면도</button>
-          <button data-v="persp">단면투시도</button>
+          <button data-v="section">단면도</button>
+          <button data-v="persp" class="on">단면투시도</button>
         </div>
         <div class="row">
-          <label class="f"><b>단면 폭 (m)</b><input type="number" id="s-w" value="16" min="4" max="100" /></label>
-          <label class="f"><b>지상 층수</b><input type="number" id="s-n" value="3" min="1" max="20" /></label>
+          <label class="f"><b>단면 폭 (m)</b><input type="number" id="s-w" value="42" min="4" max="100" /></label>
+          <label class="f"><b>지상 층수</b><input type="number" id="s-n" value="5" min="1" max="20" /></label>
         </div>
         <div class="row">
-          <label class="f"><b>1층 층고</b><input type="number" id="s-gfh" value="4.2" step="0.1" /></label>
-          <label class="f"><b>기준층 층고</b><input type="number" id="s-fh" value="3.4" step="0.1" /></label>
+          <label class="f"><b>1층 층고</b><input type="number" id="s-gfh" value="6.0" step="0.1" /></label>
+          <label class="f"><b>기준층 층고</b><input type="number" id="s-fh" value="4.5" step="0.1" /></label>
         </div>
         <div class="row">
           <label class="f"><b>지하 층수</b><input type="number" id="s-b" value="1" min="0" max="5" /></label>
-          <label class="f"><b>슬래브 (mm)</b><input type="number" id="s-slab" value="250" step="10" /></label>
+          <label class="f"><b>슬래브 (mm)</b><input type="number" id="s-slab" value="600" step="10" /></label>
         </div>
         <label class="f"><b>지붕</b>
           <select id="s-roof"><option value="flat">평지붕</option><option value="gable">박공지붕</option></select>
         </label>
-        <label class="f"><b>실 이름 (아래층부터, 한 줄에 한 층)</b>
-          <textarea id="s-rooms" rows="5">주차·기계실
-로비·카페
-작업실
-거실·라운지</textarea></label>
+        <label class="f"><b>실 이름 | 프로그램 그룹 (아래층부터, * = 강조 바닥)</b>
+          <textarea id="s-rooms" rows="8">아카이브·기계실 | Archive
+이벤트홀·마켓 * | Events
+공연장·리허설 | Performance
+라운지·갤러리 | Performance
+팹랩·작업실 | Invention
+스카이가든 | Relaxation</textarea></label>
+        <label class="f"><b>아트리움 폭</b><div class="rng"><input type="range" id="s-atr" min="0" max="50" value="30" /><output>30%</output></div></label>
+        <label class="f"><b>강조색</b>
+          <select id="s-acc">
+            <option value="#b3261e">레드</option>
+            <option value="#1f5fa8">블루</option>
+            <option value="#3f7a4a">그린</option>
+            <option value="#d08a1c">오커</option>
+          </select>
+        </label>
         <div class="chk">
-          <label><input type="checkbox" id="s-void" checked /> 2개층 보이드</label>
-          <label><input type="checkbox" id="s-stair" checked /> 계단</label>
+          <label><input type="checkbox" id="s-esc" checked /> 에스컬레이터</label>
+          <label><input type="checkbox" id="s-garden" checked /> 옥상 정원</label>
+          <label><input type="checkbox" id="s-city" checked /> 배경 도시</label>
+          <label><input type="checkbox" id="s-sky" checked /> 하늘·구름</label>
           <label><input type="checkbox" id="s-ppl" checked /> 사람</label>
         </div>
-        <div data-sp="persp" hidden class="body" style="padding:0">
-          <label class="f"><b>투시 깊이 (m)</b><div class="rng"><input type="range" id="s-depth" min="4" max="40" value="14" /><output>14</output></div></label>
-          <label class="f"><b>소실점 좌우 위치</b><div class="rng"><input type="range" id="s-vpx" min="15" max="85" value="58" /><output>58%</output></div></label>
+        <div data-sp="persp" class="body" style="padding:0">
+          <label class="f"><b>투시 깊이 (m)</b><div class="rng"><input type="range" id="s-depth" min="4" max="60" value="24" /><output>14</output></div></label>
+          <label class="f"><b>소실점 좌우 위치</b><div class="rng"><input type="range" id="s-vpx" min="15" max="85" value="52" /><output>58%</output></div></label>
           <label class="f"><b>눈높이 층</b><select id="s-eye"></select></label>
         </div>
       </div>
@@ -353,8 +395,24 @@
       <h2>디테일 설정</h2>
       <div class="body">
         <div class="seg" id="d-mode">
-          <button data-v="draw" class="on">디테일 도면</button>
+          <button data-v="wall" class="on">상세 단면</button>
+          <button data-v="draw">부위 상세</button>
           <button data-v="explode">분해 다이어그램</button>
+        </div>
+        <div data-dm="wall" class="body" style="padding:0">
+          <div class="row">
+            <label class="f"><b>층수 (옥상층 제외)</b><input type="number" id="d-n" value="3" min="1" max="4" /></label>
+            <label class="f"><b>층고 (m)</b><input type="number" id="d-fh" value="3.3" step="0.1" min="2.6" max="5" /></label>
+          </div>
+          <label class="f"><b>옥상층</b>
+            <select id="d-roof"><option value="glass">유리 지붕 파빌리온</option><option value="flat">평지붕 (파라펫)</option></select>
+          </label>
+          <div class="chk">
+            <label><input type="checkbox" id="d-terr" checked /> 테라스</label>
+            <label><input type="checkbox" id="d-street" checked /> 가로 맥락</label>
+            <label><input type="checkbox" id="d-sky" checked /> 하늘 해칭</label>
+          </div>
+          <p class="hint">외벽은 아래 '부위 프리셋'에서 고른 외벽 레이어로 그립니다.</p>
         </div>
         <label class="f"><b>부위 프리셋</b><select id="d-preset"></select></label>
         <label class="f"><b>레이어 (재료 | 두께mm | 해치 | 열전도율 λ) — 외부 → 실내</b>
@@ -1420,8 +1478,8 @@ const TABS = [
 let cur = 'diagram';
 try { const s = localStorage.getItem('arch-ai-tab'); if (TABS.some(t => t.id === s)) cur = s; } catch (e) { }
 const TOOLS = {
-  diagram: () => ({ mass: drawMass, bubble: drawBubble, env: drawEnv })[segVal('dg-type')](),
-  plan: drawPlan, elev: drawElev, section: drawSection, detail: drawDetail,
+  diagram: () => ({ mass: () => drawMass(), bubble: () => drawBubble(), env: () => drawEnv() })[segVal('dg-type')](),
+  plan: () => drawPlan(), elev: () => drawElev(), section: () => drawSection(), detail: () => drawDetail(),
 };
 let last = null;
 function render() {
@@ -1454,7 +1512,7 @@ function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('o
 function download(name, blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
 const fname = ext => `${(G.project || 'drawing').replace(/[^\w가-힣-]+/g, '_')}_${cur}.${ext}`;
 
-(function init() {
+document.addEventListener('DOMContentLoaded', function init() {
   $('#tabs').innerHTML = TABS.map(t => `<button role="tab" data-id="${t.id}"><span>${t.n}</span>${t.ko}</button>`).join('');
   $$('#tabs button').forEach(b => b.addEventListener('click', () => setTab(b.dataset.id)));
   $('#g-style').innerHTML = Object.entries(STYLES).map(([k, v]) => `<option value="${k}">${v.ko}</option>`).join('');
@@ -1463,12 +1521,12 @@ const fname = ext => `${(G.project || 'drawing').replace(/[^\w가-힣-]+/g, '_')
   $('#d-preset').innerHTML = Object.entries(PRESETS).map(([k, v]) => `<option value="${k}">${v.ko}</option>`).join('');
   $('#d-layers').value = PRESETS.wallEx.layers;
   $('#d-preset').addEventListener('change', () => { $('#d-layers').value = PRESETS[$('#d-preset').value].layers; render(); });
-  const fillEye = () => { const n = clamp(Math.round(num('s-n')), 1, 30), b = clamp(Math.round(num('s-b')), 0, 6), v = $('#s-eye').value || '1'; let h = ''; for (let k = -b + 1; k <= n; k++) h += `<option value="${k}">${k <= 0 ? 'B' + (1 - k) : k + 'F'}</option>`; $('#s-eye').innerHTML = h; $('#s-eye').value = $(`#s-eye option[value="${v}"]`) ? v : '1'; };
+  const fillEye = () => { const n = clamp(Math.round(num('s-n')), 1, 30), b = clamp(Math.round(num('s-b')), 0, 6), v = $('#s-eye').value || String(Math.max(1, Math.round(n / 2))); let h = ''; for (let k = -b + 1; k <= n; k++) h += `<option value="${k}">${k <= 0 ? 'B' + (1 - k) : k + 'F'}</option>`; $('#s-eye').innerHTML = h; $('#s-eye').value = $(`#s-eye option[value="${v}"]`) ? v : String(Math.max(1, Math.round(n / 2))); };
   fillEye(); $('#s-n').addEventListener('input', fillEye); $('#s-b').addEventListener('input', fillEye);
   initSeg('dg-type', v => $$('[data-dg]').forEach(el => el.hidden = el.dataset.dg !== v));
   initSeg('s-mode', v => $$('[data-sp]').forEach(el => el.hidden = el.dataset.sp !== v));
-  initSeg('d-mode');
-  $$('.rng').forEach(r => { const i = $('input', r), out = $('output', r), suf = /ratio|vpx/.test(i.id) ? '%' : /rot/.test(i.id) ? '°' : ''; const u = () => out.textContent = i.value + suf; i.addEventListener('input', u); u(); });
+  initSeg('d-mode', v => $$('[data-dm]').forEach(el => el.hidden = el.dataset.dm !== v));
+  $$('.rng').forEach(r => { const i = $('input', r), out = $('output', r), suf = /ratio|vpx|atr/.test(i.id) ? '%' : /rot/.test(i.id) ? '°' : ''; const u = () => out.textContent = i.value + suf; i.addEventListener('input', u); u(); });
   document.addEventListener('input', e => { if (e.target.closest('aside')) render(); });
   document.addEventListener('change', e => { if (e.target.closest('aside') && e.target.tagName === 'SELECT') render(); });
   $('#p-shuffle').addEventListener('click', () => { const ta = $('#p-rooms'), ls = ta.value.split('\n').filter(l => l.trim()); for (let i = ls.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[ls[i], ls[j]] = [ls[j], ls[i]]; } ta.value = ls.join('\n'); render(); });
@@ -1480,13 +1538,14 @@ const fname = ext => `${(G.project || 'drawing').replace(/[^\w가-힣-]+/g, '_')
   $('#dl-png').addEventListener('click', () => {
     if (!last) return;
     const img = new Image(), url = URL.createObjectURL(new Blob([last.svg], { type: 'image/svg+xml' }));
-    img.onload = () => { const c = document.createElement('canvas'); c.width = VW * 2; c.height = VH * 2; const x = c.getContext('2d'); x.fillStyle = PAPER; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); c.toBlob(b => { download(fname('png'), b); toast('PNG 저장 — AI 엔진에 첨부하세요'); }); };
+    img.onload = () => { const c = document.createElement('canvas'); const w = last.w || VW, h = last.h || VH; c.width = w * 2; c.height = h * 2; const x = c.getContext('2d'); x.fillStyle = PAPER; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); c.toBlob(b => { download(fname('png'), b); toast('PNG 저장 — AI 엔진에 첨부하세요'); }); };
     img.src = url;
   });
   $$('#tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.id === cur));
   $$('.ctrl').forEach(c => c.hidden = c.dataset.tab !== cur);
   render();
-})();
+});
 </script>
+<script src="studio.js"></script>
 </body>
 </html>
