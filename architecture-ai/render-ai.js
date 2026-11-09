@@ -8,6 +8,11 @@
   'use strict';
   const $ = s => document.querySelector(s);
   const DEFAULT_MODEL = { gemini: 'gemini-2.5-flash-image', openai: 'gpt-image-1' };
+  const KEY_HINT = {
+    openai: '키 발급: <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a> · 이미지 모델은 OpenAI 조직 인증(Verify Organization)이 필요할 수 있습니다. 렌더 비용은 키 주인 계정에 청구됩니다.',
+    gemini: '키 발급: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a> · 렌더 비용은 키 주인 계정에 청구됩니다.',
+  };
+  const showHint = p => { const el = document.querySelector('#ai-keyhint'); if (el) el.innerHTML = KEY_HINT[p] || ''; };
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { } },
@@ -151,15 +156,17 @@
   const baseRender = window.render;
   window.render = function () { baseRender(); try { window.__lastResult = last; } catch (e) { } drawRefs(); fillPrompt(); };
   document.addEventListener('DOMContentLoaded', () => {
-    const prov = store.get('arch-ai-prov') || 'gemini';
+    const prov = store.get('arch-ai-prov') || 'openai';
     $('#ai-prov').value = prov;
     $('#ai-model').value = store.get('arch-ai-model-' + prov) || DEFAULT_MODEL[prov];
     $('#ai-key').value = store.get('arch-ai-key-' + prov) || '';
+    showHint(prov);
     $('#ai-remember').checked = store.get('arch-ai-remember') !== '0';
     $('#ai-prov').addEventListener('change', () => {
       const p = $('#ai-prov').value; store.set('arch-ai-prov', p);
       $('#ai-model').value = store.get('arch-ai-model-' + p) || DEFAULT_MODEL[p];
       $('#ai-key').value = store.get('arch-ai-key-' + p) || '';
+      showHint(p);
     });
     $('#ai-model').addEventListener('change', () => store.set('arch-ai-model-' + $('#ai-prov').value, $('#ai-model').value.trim() || null));
     const saveKey = () => store.set('arch-ai-key-' + $('#ai-prov').value, $('#ai-remember').checked ? ($('#ai-key').value.trim() || null) : null);
