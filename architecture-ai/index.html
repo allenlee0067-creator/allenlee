@@ -88,6 +88,23 @@
   .pbox pre.neg{color:var(--ink-3)}
   .ko{font-size:13px;color:var(--ink-2);background:var(--accent-wash);padding:10px 12px;border-radius:2px;margin:0}
   .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px}
+  .ai-grid{display:grid;grid-template-columns:1fr 1.3fr 1.6fr;gap:10px}
+  .thumbs{display:flex;gap:8px;flex-wrap:wrap}
+  .thumbs figure{margin:0;position:relative;width:92px;height:92px;border:1px solid var(--line-2);background:var(--white)}
+  .thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumbs button{position:absolute;top:2px;right:2px;border:0;background:var(--ink);color:var(--paper);width:20px;height:20px;font-size:12px;line-height:20px;padding:0}
+  .drop{border:1px dashed var(--line-2);background:var(--white);padding:12px;text-align:center;font-size:12.5px;color:var(--ink-3);cursor:pointer}
+  .drop.on{border-color:var(--accent);background:var(--accent-wash)}
+  .ai-run{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .ai-status{font-size:12.5px;color:var(--ink-3)}
+  .ai-status.err{color:var(--accent-d)}
+  .ai-out{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+  .ai-out figure{margin:0;border:1px solid var(--line);background:var(--white)}
+  .ai-out img{width:100%;display:block}
+  .ai-out figcaption{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;font:500 11px var(--mono);color:var(--ink-3)}
+  .ai-out a{color:var(--ink);font-weight:600;white-space:nowrap;margin-left:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spin{width:14px;height:14px;border:2px solid var(--line-2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;vertical-align:middle}
   .flow div{background:var(--white);border:1px solid var(--line);padding:9px 10px;font-size:12px;color:var(--ink-2)}
   .flow div b{display:block;font:600 11px var(--mono);color:var(--accent);margin-bottom:2px}
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;font-size:13px;border-radius:2px;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -95,6 +112,7 @@
   [hidden]{display:none!important}
 
   @media (max-width:980px){
+    .ai-grid{grid-template-columns:1fr}
     main{grid-template-columns:1fr;padding:16px}
     .hd,nav.tabs{padding-left:16px;padding-right:16px}
     .flow{grid-template-columns:1fr 1fr}
@@ -439,6 +457,34 @@
         <button class="btn pri" id="dl-png" type="button">PNG 저장 (참조용)</button>
       </div>
       <div id="stage"></div>
+    </section>
+
+    <section class="card" id="ai-card">
+      <div class="bar"><h2>AI 렌더 · 레퍼런스 품질로 마감</h2><span class="meta" id="ai-meta"></span></div>
+      <div class="pbox">
+        <p class="ko">위 도면을 <b>형태 기준</b>, 올린 레퍼런스 이미지를 <b>스타일 기준</b>으로 AI가 최종 보드를 그립니다. API 키는 이 브라우저에만 저장되고 고른 AI 회사로만 전송됩니다.</p>
+        <div class="ai-grid">
+          <label class="f"><b>AI 서비스</b>
+            <select id="ai-prov">
+              <option value="gemini">Google Gemini (이미지)</option>
+              <option value="openai">OpenAI (gpt-image)</option>
+            </select>
+          </label>
+          <label class="f"><b>모델 이름</b><input type="text" id="ai-model" spellcheck="false" /></label>
+          <label class="f"><b>API 키</b><input type="password" id="ai-key" autocomplete="off" placeholder="키를 붙여넣기" /></label>
+        </div>
+        <div class="chk"><label><input type="checkbox" id="ai-remember" checked /> 이 브라우저에 키 저장</label></div>
+        <div class="lbl">스타일 레퍼런스 (선택, 최대 4장 · 이 탭에만 적용)</div>
+        <div class="drop" id="ai-drop">레퍼런스 이미지를 끌어다 놓거나 눌러서 고르기<input type="file" id="ai-file" accept="image/*" multiple hidden /></div>
+        <div class="thumbs" id="ai-refs"></div>
+        <div class="lbl">AI 지시문<span class="sp"></span><button class="btn" id="ai-reset" type="button">현재 도면 기준으로 다시 채우기</button></div>
+        <textarea id="ai-prompt" rows="7"></textarea>
+        <div class="ai-run">
+          <button class="btn pri" id="ai-go" type="button">AI 렌더 실행</button>
+          <span class="ai-status" id="ai-status"></span>
+        </div>
+        <div class="ai-out" id="ai-out"></div>
+      </div>
     </section>
 
     <section class="card">
@@ -1535,6 +1581,13 @@ document.addEventListener('DOMContentLoaded', function init() {
     try { await navigator.clipboard.writeText(t); toast('복사했습니다'); } catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('복사했습니다'); }
   }));
   $('#dl-svg').addEventListener('click', () => last && download(fname('svg'), new Blob([last.svg], { type: 'image/svg+xml' })));
+  window.sheetPng = (maxSide = 2048) => new Promise((res, rej) => {
+    if (!last) return rej(new Error('도면이 없습니다'));
+    const img = new Image(), url = URL.createObjectURL(new Blob([last.svg], { type: 'image/svg+xml' }));
+    img.onload = () => { const w = last.w || VW, h = last.h || VH, k = Math.min(2, maxSide / Math.max(w, h)); const c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k); const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); c.toBlob(b => b ? res(b) : rej(new Error('PNG 변환 실패')), 'image/png'); };
+    img.onerror = () => rej(new Error('도면 이미지 변환 실패'));
+    img.src = url;
+  });
   $('#dl-png').addEventListener('click', () => {
     if (!last) return;
     const img = new Image(), url = URL.createObjectURL(new Blob([last.svg], { type: 'image/svg+xml' }));
@@ -1547,5 +1600,6 @@ document.addEventListener('DOMContentLoaded', function init() {
 });
 </script>
 <script src="studio.js"></script>
+<script src="render-ai.js"></script>
 </body>
 </html>
