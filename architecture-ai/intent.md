@@ -44,10 +44,12 @@
    같은 입력이면 같은 도면이 나온다(시드 고정 난수). 변주는 '수목 변주', '재질 변주' 숫자로만 바꾼다.
 
 ## 공개 위치
-- **운영:** `www.mmggdesignlab.com/architecture-ai` — `mmgg-website` 저장소의 `architecture-ai/` 폴더. 사이트 왼쪽 메뉴 맨 아래 'AI 도면'.
-- **개발용 사본:** `mmggdesignlab.vercel.app/architecture-ai/` — `allenlee` 저장소.
-- 두 사본은 같은 파일 3개(`index.html`, `studio.js`, `render-ai.js`)다. 고치면 두 저장소에 같이 반영한다.
-- 실제 도메인은 끝에 `/`가 붙지 않는 주소(`trailingSlash: false`)라서 스크립트 경로는 반드시 `/architecture-ai/…` 절대 경로로 쓴다.
+- **유일한 입구: `https://ai.mmggdesignlab.com`** — 홈페이지·다른 페이지 어디에도 링크를 두지 않는다. 주소를 아는 사람만 들어온다.
+- 배포: Vercel 프로젝트 `mmgg-ai` = `allenlee` 저장소의 `architecture-ai/` 폴더만 사이트 루트로 배포.
+- 홈페이지(`www.mmggdesignlab.com`, `mmgg-website` 저장소)에는 도구 파일·메뉴 링크·사이트맵 항목을 두지 않는다.
+- `allenlee` 저장소의 다른 Vercel 프로젝트들에서 `/architecture-ai`로 오면 `ai.mmggdesignlab.com`으로 보낸다 (루트 `vercel.json`).
+- 도구 원본은 `allenlee/architecture-ai/` 한 곳뿐이다. 스크립트 경로는 상대 경로(`studio.js`)로 쓴다.
+- DNS는 가비아에서 관리한다: `ai` CNAME → Vercel이 알려준 값.
 
 ## 구조
 | 파일 | 역할 |
@@ -65,7 +67,7 @@
 ## 다음 작업 (우선순위 순)
 - [x] **AI 렌더 기본 서비스를 OpenAI로 변경** — 첫 방문 기본값 OpenAI, 키 발급 링크·조직 인증·비용 안내 추가
 - [ ] **02 평면도 품질 끌어올리기** — 실제 OpenAI 키로 렌더해 레퍼런스 3번과 비교, 지시문·도면 보강
-- [x] 실제 도메인 `www.mmggdesignlab.com/architecture-ai`에 공개 — `mmgg-website`로 이전, 메뉴 링크·사이트맵 추가
+- [x] 홈페이지에서 숨기고 전용 주소 `ai.mmggdesignlab.com`으로만 접속 (가비아 CNAME 추가 필요)
 - [ ] 04 단면투시 → 01 다이어그램 → 03·05 순서로 같은 품질 점검
 - [ ] 외부 공개 전 확인: 키 입력 안내 문구, 키 발급 링크, 렌더 1회 비용 안내
 - [ ] OpenAI 최신 이미지 모델명 확인 후 기본값 갱신 (현재 `gpt-image-1`)

@@ -1,0 +1,14 @@
+{
+  "redirects": [
+    {
+      "source": "/architecture-ai",
+      "destination": "https://ai.mmggdesignlab.com/",
+      "permanent": false
+    },
+    {
+      "source": "/architecture-ai/:path*",
+      "destination": "https://ai.mmggdesignlab.com/",
+      "permanent": false
+    }
+  ]
+}
