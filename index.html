@@ -136,20 +136,11 @@
     content:"→";font-family:var(--sans);
     font-size:13px;letter-spacing:0;
   }
-  .nav-ai-s{display:none}
   @media (max-width:980px){
-    .nav-links{gap:0}
-    .nav-links a:not(.nav-ai){display:none}
-    .nav-inner{grid-template-columns:1fr auto auto;padding:14px 20px;gap:16px}
+    .nav-links{display:none}
+    .nav-inner{grid-template-columns:1fr auto;padding:14px 20px}
     .brand-en{display:none}
   }
-  @media (max-width:480px){
-    .nav-inner{gap:12px}
-    .nav-links{letter-spacing:.14em}
-    .nav-ai-l{display:none}
-    .nav-ai-s{display:inline}
-  }
-  .nav-ai{white-space:nowrap}
   @media (max-width:360px){
     .nav-inner{padding:12px 14px;gap:10px}
     .nav-cta{padding:12px 14px;letter-spacing:.16em}
@@ -1267,7 +1258,6 @@
       <a href="#works">Project</a>
       <a href="#journal">Media</a>
       <a href="#contact">Contact</a>
-      <a class="nav-ai" href="/architecture-ai/"><span class="nav-ai-l">AI Drawing Kit</span><span class="nav-ai-s">AI Kit</span></a>
     </div>
     <button class="nav-cta" type="button" onclick="document.getElementById('consult').scrollIntoView({behavior:'smooth',block:'start'})">
       Consult
@@ -2110,7 +2100,6 @@
         <li><a href="#works">Project</a></li>
         <li><a href="#journal">Media</a></li>
         <li><a href="#contact">Contact</a></li>
-        <li><a href="/architecture-ai/">AI Drawing Kit</a></li>
       </ul>
     </div>
     <div>
