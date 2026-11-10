@@ -5,7 +5,7 @@
 #     로컬에서는 OPENAI_API_KEY 환경변수를 쓴다.
 set -euo pipefail
 IMG="$1"; BRIEF="$2"
-MODEL="${OPENAI_REVIEW_MODEL:-gpt-5}"
+MODEL="${OPENAI_REVIEW_MODEL:-gpt-5.5}"
 KEY="${OPENAI_API_KEY:-sk-proxy-injected}"
 case "$IMG" in *.png) MIME=image/png;; *) MIME=image/jpeg;; esac
 B64=$(base64 -w0 "$IMG")

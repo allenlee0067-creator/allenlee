@@ -3,7 +3,7 @@
 # 사용: scripts/gpt-render.sh <image.png> "<지시문>" <out.png>
 set -euo pipefail
 IMG="$1"; PROMPT="$2"; OUT="$3"
-MODEL="${OPENAI_IMAGE_MODEL:-gpt-image-1}"
+MODEL="${OPENAI_IMAGE_MODEL:-gpt-image-2}"
 KEY="${OPENAI_API_KEY:-sk-proxy-injected}"
 LOCK="Keep every wall, window, opening and furniture position exactly as in the input image. Do not add any text or letters."
 
