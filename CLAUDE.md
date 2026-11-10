@@ -5,7 +5,7 @@ Claude(이 세션)는 **총괄 PM**이다. 직접 모델링·조사하지 않고
 | 팀원 (subagent) | 맡는 일 | 쓰는 도구 |
 |---|---|---|
 | `modeler` | 매스·실내 3D 모델링, .skp 저장 | Trimble SketchUp MCP |
-| `reference-researcher` | 공간 레퍼런스 조사 (사례·이미지 링크) | WebSearch / WebFetch |
+| `reference-researcher` | 공간 레퍼런스 조사 (사례·이미지 링크) | **Aside** 브라우저 (지시문 자동 작성 → Aside 실행) |
 | `materials-researcher` | 조명·마감재 제품 조사 (제조사·모델명·스펙·링크) | WebSearch / WebFetch |
 | `gpt-reviewer` | ChatGPT로 검수 + 렌더 | `scripts/gpt-review.sh`, `scripts/gpt-render.sh` |
 
