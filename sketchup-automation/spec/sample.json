@@ -1,0 +1,78 @@
+{
+  "project": "샘플 근린생활시설 3층",
+  "units": "mm",
+  "site": { "w": 20000, "d": 16000 },
+  "building": { "x": 3000, "y": 3000, "w": 14000, "d": 10000 },
+  "wall": { "exterior": 300, "interior": 150, "door_head": 2100 },
+  "slab": 250,
+  "roof": { "parapet": 1100 },
+  "levels": [
+    {
+      "name": "1F",
+      "height": 4200,
+      "rooms": [
+        { "name": "카페", "x": 0, "y": 0, "w": 8000, "d": 10000 },
+        { "name": "화장실", "x": 8000, "y": 0, "w": 6000, "d": 3000 },
+        { "name": "창고", "x": 8000, "y": 3000, "w": 6000, "d": 3000 },
+        { "name": "계단실", "x": 8000, "y": 6000, "w": 6000, "d": 4000 }
+      ],
+      "openings": [
+        { "side": "S", "offset": 800, "width": 7400, "height": 3200, "sill": 0, "type": "glass" },
+        { "side": "N", "offset": 12200, "width": 1200, "height": 2400, "sill": 0, "type": "door" },
+        { "side": "E", "offset": 1000, "width": 1200, "height": 1000, "sill": 1200, "type": "window" }
+      ],
+      "interior_doors": [
+        { "x": 8000, "y": 1500, "width": 900 },
+        { "x": 8000, "y": 4500, "width": 900 },
+        { "x": 8000, "y": 8000, "width": 1200 }
+      ],
+      "stairs": [
+        { "x": 9600, "y": 6300, "w": 4100, "d": 2600, "dir": "+x", "type": "U" }
+      ],
+      "furniture": [
+        { "name": "카페테이블", "x": 1200, "y": 1500, "w": 800, "d": 800, "h": 720,
+          "repeat": { "nx": 3, "ny": 3, "dx": 2500, "dy": 2800 } },
+        { "name": "바카운터", "x": 5200, "y": 8800, "w": 2000, "d": 700, "h": 1050 }
+      ]
+    },
+    {
+      "name": "2F",
+      "height": 3600,
+      "rooms": [
+        { "name": "사무실", "x": 0, "y": 0, "w": 8000, "d": 10000 },
+        { "name": "회의실", "x": 8000, "y": 0, "w": 6000, "d": 6000 },
+        { "name": "계단실", "x": 8000, "y": 6000, "w": 6000, "d": 4000 }
+      ],
+      "openings": [
+        { "side": "S", "offset": 800, "width": 2000, "height": 1800, "sill": 900, "type": "window",
+          "repeat": { "n": 3, "step": 2500 } },
+        { "side": "S", "offset": 10200, "width": 2400, "height": 1800, "sill": 900, "type": "window" },
+        { "side": "W", "offset": 2000, "width": 6000, "height": 1800, "sill": 900, "type": "window" }
+      ],
+      "interior_doors": [
+        { "x": 8000, "y": 4800, "width": 900 },
+        { "x": 8000, "y": 7200, "width": 1200 }
+      ],
+      "stairs": [
+        { "x": 9600, "y": 6300, "w": 4100, "d": 2600, "dir": "+x", "type": "U" }
+      ],
+      "furniture": [
+        { "name": "업무책상", "x": 800, "y": 1200, "w": 1400, "d": 700, "h": 740,
+          "repeat": { "nx": 4, "ny": 3, "dx": 1800, "dy": 2600 } },
+        { "name": "회의테이블", "x": 9800, "y": 1800, "w": 2400, "d": 1100, "h": 740 }
+      ]
+    },
+    {
+      "name": "3F",
+      "height": 3600,
+      "copy_from": "2F",
+      "stairs": []
+    }
+  ],
+  "export": {
+    "scenes": true,
+    "section_y": 5000,
+    "plan_cut": 1200,
+    "png_width": 2400
+  }
+}
